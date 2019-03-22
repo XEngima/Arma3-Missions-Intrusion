@@ -9,13 +9,22 @@
  */
 
 using Intrusion.Communication;
+using Intrusion.Common;
 
 namespace Intrusion.Client
 {
 	public class ClientEventHandlers
 	{
+		public constructor()
+		{
+		};
+		
+		public static property Object LastInstigator { get; private set; };
+		
 		public static method Init()
 		{
+			ClientEventHandlers.LastInstigator = objNull;
+			
 			// Fires when preload finishes.
 			["ClientEventHandlerId_01", "onPreloadFinished",
 			{ 
@@ -24,8 +33,8 @@ namespace Intrusion.Client
 					[gCommonConfig.MapMarkers] call JipService.StartAsync;
 				}
 				else {
-						cutText ["","BLACK IN", 1];
-						
+					cutText ["","BLACK IN", 1];
+					
 					// Show the Welcome tutorial
 					[] spawn {
 						sleep 1;
@@ -42,6 +51,70 @@ namespace Intrusion.Client
 			addMissionEventHandler ["MapSingleClick", {
 				params ["_units" as Array, "_pos" as Array, "_alt" as Boolean, "_shift" as Boolean];
 				[_pos] call gClient.GiveOrderService.SendMapClick;
+			}];
+			
+			player addEventHandler ["Respawn", {
+				params ["_player" as Object, "_corpse"];
+				["ClientEventReciever.OnPlayerRespawn", [_player, _corpse]] call Remote.Invoke;
+			}];
+			
+			player addEventHandler ["Take", {
+				params ["_unit" as Object, "_container" as Object, "_item" as Object];
+				private ["_squadCollection" as SquadCollection, "_squad" as Squad, "_itemIsRangeSniperRifle" as Boolean, "_itemIsRangeFinder" as Boolean];
+				
+				if (_unit == player) then
+				{
+					_itemIsRangeSniperRifle = (_item call BIS_fnc_itemtype) select 1 == "SniperRifle";
+					_itemIsRangeFinder = "RangeFinder" in  (vestItems player + uniformItems player + backpackItems player + assignedItems player);
+					
+					if ((_itemIsRangeFinder || _itemIsRangeSniperRifle) && call PublicVariableHandler.SquadsHasValue) then
+					{
+						_squadCollection = call PublicVariableHandler.GetSquads;
+						_squad = [group player] call _squadCollection.GetSquadByGroup;
+						
+						if (isNull _squad || {_squad.ProfessionType != ProfessionType.Sniper}) then {
+							player removeWeapon primaryWeapon player;
+							
+							removeGoggles player;
+							
+							["Only sniper teams are allowed to have that item.", player] call ClientMessageHandler.ShowMessage;
+						};
+					};
+				};
+			}];
+			
+			player addEventHandler ["GetInMan", {
+				params ["_unit" as Object, "_role" as String, "_vehicle" as Object, "_turret" as Array];
+				//private ["_resourceLocationCollection" as ResourceLocationCollection] // SQX TODO: Why is this "never used"?
+				
+				if (call PublicVariableHandler.ResourceLocationCollectionHasValue) then {
+					private _resourceLocationCollection = call PublicVariableHandler.GetResourceLocationCollection;
+					[_resourceLocationCollection] call ClientResourceLocationHandler.UpdateResourceLocations;
+				};
+			}];
+			
+			player addEventHandler ["GetOutMan", {
+				params ["_unit" as Object, "_role" as String, "_vehicle" as Object, "_turret" as Array];
+				//private ["_resourceLocationCollection" as ResourceLocationCollection]
+				
+				if (call PublicVariableHandler.ResourceLocationCollectionHasValue) then {
+					private _resourceLocationCollection = call PublicVariableHandler.GetResourceLocationCollection;
+					[_resourceLocationCollection] call ClientResourceLocationHandler.UpdateResourceLocations;
+				};
+			}];
+			
+			player addEventHandler ["AnimStateChanged", {
+				params ["_unit" as Object, "_anim" as String];
+
+				if (_anim == "unconsciousrevivedefault" && !isNull ClientEventHandlers.LastInstigator) then {
+					["ClientEventReciever.OnPlayerKilled", [player, ClientEventHandlers.LastInstigator, ClientEventHandlers.LastInstigator, false, playerSide]] call Remote.Invoke;
+		    	};
+			}];
+			
+			player addEventHandler ["Hit", {
+				params ["_unit" as Object, "_source", "_damage", "_instigator" as Object];
+				
+				ClientEventHandlers.LastInstigator = _instigator; // TODO SQX: LastInstigator is "inaccessible due to its protection level"?
 			}];
 		};
 	};

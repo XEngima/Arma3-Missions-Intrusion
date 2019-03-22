@@ -24,7 +24,7 @@ namespace Intrusion.Client
 			if (_playerUid == getPlayerUID player) then {
 				ClientState.IsBrigadeLeader = true;
 				
-				if (!PublicVariableHandler.OrderCollectionHasValue) then {
+				if (!call PublicVariableHandler.OrderCollectionHasValue) then {
 					_orderCollection = new OrderCollection;
 					[_orderCollection] call PublicVariableHandler.BroadcastOrderCollection;
 				};
@@ -41,6 +41,8 @@ namespace Intrusion.Client
 			if (_playerUid == getPlayerUID player) then {
 				["Your claim for brigade leadership was rejected.", player] call ClientMessageHandler.ShowMessage;
 			};
+			
+			call IntrusionMenuHandler.UpdateVisibleOptions;
 		};
 		
 		// Called when a player quits as brigade leader
@@ -56,23 +58,27 @@ namespace Intrusion.Client
 		// Called when a player joined a group
 		public static method OnPlayerJoinedGroup("_player" as Object, "_oldGroup" as Group, "_newGroup" as Group)
 		{
-			call GroupActionHandler.UpdateAllInvitePlayerActions;
-			call IntrusionMenuHandler.UpdateVisibleOptions;
-			
 			if (_player == player) then {
+				ClientState.MyGroup = _newGroup;
+				ClientState.IsSquadLeader = false;
 				call gClient.TaskHandler.UpdateWithGroupTask;
 			};
+			
+			call GroupActionHandler.UpdateAllInvitePlayerActions;
+			call IntrusionMenuHandler.UpdateVisibleOptions;
 		};
 		
 		// Called when a player left a group
 		public static method OnPlayerLeftGroup("_player" as Object, "_oldGroup" as Group)
 		{
-			call GroupActionHandler.UpdateAllInvitePlayerActions;
-			call IntrusionMenuHandler.UpdateVisibleOptions;
-			
 			if (_player == player) then {
+				ClientState.MyGroup = group player;
+				ClientState.IsSquadLeader = true;
 				call gClient.TaskHandler.DeleteAllTasksAndReset;
 			};
+			
+			call GroupActionHandler.UpdateAllInvitePlayerActions;
+			call IntrusionMenuHandler.UpdateVisibleOptions;
 		};
 		
 		// Called when a JIP player has connected.
@@ -98,15 +104,24 @@ namespace Intrusion.Client
 			};
 		};
 		
-		// Called when a player was killed.
+		// Called when a player was killed (or got unconsious).
 		// _unit (Object): The dead body.
 		// _side (Side): The player's side.
-		public static method OnPlayerKilled("_unit" as Object, "_killer" as Object, "_instigator" as Object, "_useEffects" as Boolean, "_side" as Side)
+		public static method OnPlayerKilled("_unit" as Object, "_killer" as Object, "_instigator" as Object, "_useEffects" as Boolean, "_side" as Side, "_nearestMine" as Object)
 		{
-			removeAllActions _unit;
-			
-			if (_killer == player && [_side, side _killer] call BIS_fnc_sideIsFriendly) then {
-				[_killer] call gClient.PrisonHandler.InprisonPlayer;
+			private ["_prisonService" as PrisonService];
+
+			if (gCommon.MissionParametersHandler.UseTeamKillPrison) then {
+				if (_unit != _killer && _killer == player && [_side, side _killer] call BIS_fnc_sideIsFriendly) then {
+				
+					// Do not start prison service if player was killed by mines
+					_nearestMine = [getPos player] call Functions.GetNearestMine;
+					
+					if (isNull _nearestMine || {_unit distance _nearestMine > 10}) then {
+						_prisonService = [gCommonConfig.MapMarkers] new PrisonService;
+						call _prisonService.RunAsync;
+					};
+				};
 			};
 		};
 		
@@ -123,6 +138,24 @@ namespace Intrusion.Client
 			
 			_resourceReport = [playerSide] call _resourceReportCollection.GetReport;
 			[_resourceReport] call gClient.DisplayHandler.DisplayResourceReport;
+		};
+		
+		public static method OnPlayerRespawn("_player" as Object, "_corpse" as Object)
+		{
+			if (_player == player) then {
+				call IntrusionMenuHandler.ShowAction;
+			
+				if (!isNull ClientState.MyGroup) then {
+					[player] joinSilent ClientState.MyGroup;
+					
+					if (ClientState.IsSquadLeader) then {
+						ClientState.MyGroup selectLeader player;
+					};
+				};
+			};
+		
+			call GroupActionHandler.UpdateAllInvitePlayerActions;
+			call IntrusionMenuHandler.UpdateVisibleOptions;
 		};
 	};
 };

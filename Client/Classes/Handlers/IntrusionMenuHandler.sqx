@@ -19,7 +19,12 @@ namespace Intrusion.Client
         	call _self.UpdateVisibleOptions;
 			call _self.BuildIntrusionMenu;
 			
-			player addAction ["Open Intrusion Menu", { call IntrusionMenuHandler.Open; }];
+			call _self.ShowAction;
+		};
+		
+		public static method ShowAction()
+		{
+			player addAction ["<t color='#AAAAFF'>Open Intrusion Menu</t>", { call IntrusionMenuHandler.Open; }];
 		};
 		
 		#region Option Properties

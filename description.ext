@@ -1,3 +1,4 @@
+#include "Description\MissionParameters.ext"
 #include "Dialogs\Defines.hpp"
 #include "Dialogs\DialogControls.hpp"
 #include "Dialogs\TutorialDialog.hpp"
@@ -26,7 +27,11 @@ author = "Engima";
 
 disabledAI = 1;
 
+respawn = "BASE";
 
 //#include "Description\TutorialDialog.ext"
 
 #include "Description\RemoteExec.ext"
+
+// Revive settings
+#include "Description\Revive.ext"

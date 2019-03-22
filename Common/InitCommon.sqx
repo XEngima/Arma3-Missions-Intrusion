@@ -1,5 +1,6 @@
-call compile preprocessFileLineNumbers "Common\Enums\LogLevel.sqx";
 call compile preprocessFileLineNumbers "Common\Enums\ProfessionType.sqx";
+call compile preprocessFileLineNumbers "Common\Enums\Technology.sqx";
+call compile preprocessFileLineNumbers "Common\Enums\SkillLevel.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Configs\CommonConfig.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Configs\ProfessionConfig.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Configs\DebugConfig.sqx";
@@ -9,7 +10,10 @@ call compile preprocessFileLineNumbers "Common\Classes\Configs\TechnologyTestCon
 call compile preprocessFileLineNumbers "Common\Classes\Configs\TechnologyProdConfig.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Handlers\PublicVariableHandler.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Handlers\LogHandler.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Handlers\Functions.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Handlers\MissionParametersHandler.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\ResourceLocation.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Objects\ResourceLocationCollection.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\IntrusionVehicle.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\Profession.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\MapObservation.sqx";
@@ -23,13 +27,21 @@ call compile preprocessFileLineNumbers "Common\Classes\Objects\BaseLayout.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\ResourceReport.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\ResourceReportCollection.sqx";
 call compile preprocessFileLineNumbers "Common\Classes\Objects\TechnologyInfo.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Objects\Order.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Objects\OrderCollection.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\Objects\ValuedObject.sqx";
+call compile preprocessFileLineNumbers "Common\Classes\IntrusionCommon.sqx";
 
 using Intrusion.Common;
 
 #region Common Objects
 
+// Enum Metas
+call TechnologyMeta.Init;
+
 // Configs
 call DebugConfig.Init;
+call ProfessionTypeMeta.Init;
 
 if (DebugConfig.Mode == MissionConfigMode.Production) then {
 	gCommonConfig = [new MapMarkersConfig, new ProfessionConfig, new TechnologyProdConfig] new CommonConfig;
@@ -42,6 +54,8 @@ else {
 		gCommonConfig = [new MapMarkersConfig, new ProfessionConfig, new TechnologyDevConfig] new CommonConfig;
 	};
 };
+
+gCommon = new IntrusionCommon;
 
 // Handlers
 [DebugConfig.LogLevelFile, DebugConfig.LogLevelScreen] call LogHandler.Init;

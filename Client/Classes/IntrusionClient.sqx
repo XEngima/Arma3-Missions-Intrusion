@@ -26,7 +26,6 @@ namespace Intrusion.Client
 			_self.TeleportHandler = [_mapMarkersConfig, _baseConfig] new TeleportHandler;
 			_self.SquadMarkersConfig = new SquadMarkersConfig;
 			_self.DisplayHandler = [gCommonConfig.Technology] new DisplayHandler;
-			_self.PrisonHandler = [_mapMarkersConfig] new PrisonHandler;
 			_self.GiveOrderService = new GiveOrderService;
 			_self.TaskHandler = new TaskHandler;
 		};
@@ -35,7 +34,6 @@ namespace Intrusion.Client
 		public property MoveBaseHandler MoveBaseHandler { get; private set; };
 		public property TeleportHandler TeleportHandler { get; private set; };
 		public property DisplayHandler DisplayHandler { get; private set; };
-		public property PrisonHandler PrisonHandler { get; private set; };
 		public property GiveOrderService GiveOrderService { get; private set; };
 		public property TaskHandler TaskHandler { get; private set; };
 	};

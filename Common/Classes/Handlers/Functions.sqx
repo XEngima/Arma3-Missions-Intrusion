@@ -1,0 +1,54 @@
+/*9
+ * Name:	Functions
+ * Date:	2019-03-01
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * A common function library.
+ */
+namespace Intrusion.Common
+{
+	public class Functions
+	{
+		// Gets the correct time since mission start, no matter SP or MP.
+		// Returns time since mission start in seconds.
+		public static method Scalar Time()
+		{
+			private _time = time;
+			
+			if (isMultiplayer) then {
+				_time = serverTime;	
+			};
+			
+			_time
+		};
+		
+		// Gets the nearest mine.
+		// _pos (Array): The reference position.
+		// Returns (Object): The closest mine.
+		public static method Object GetNearestMine("_pos" as Array)
+		{
+			private ["_closestDistance" as Scalar, "_closestMine" as Object, "_closestTripwireMine" as Object];
+			
+			_closestMine = objNull;
+			_closestDistance = 999999999;
+			
+			{
+				if (_x distance _pos < _closestDistance) then {
+					_closestMine = _x;
+					_closestDistance = _x distance _pos;
+				};
+			} foreach allMines as Object;
+			
+			// Tripwires are not found above
+			_closestTripwireMine = nearestObject [_pos, "APERSTripMine_Wire_Ammo"];
+			if (_pos distance _closestTripwireMine < _closestDistance) then {
+				_closestDistance = _pos distance _closestTripwireMine;
+				_closestMine = _closestTripwireMine;
+			};
+			
+			_closestMine
+		};
+	};
+};

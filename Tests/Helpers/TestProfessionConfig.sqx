@@ -40,9 +40,8 @@ namespace Intrusion.Tests.Helpers
 		// Gets a profession.
 		// _professionType (ProfessionType): The profession type.
 		// Returns (Profession): The sought profession. classNull if the profession was not found.
-		public method Profession GetProfession("_professionType" as ProfessionType) {
-			[(str _this) + " ProfessionConfig.GetProfession"] call LogHandler.Debug;
-
+		public method Profession GetProfession("_professionType" as ProfessionType)
+		{
 			scopeName "main";
 			
 			{
@@ -66,6 +65,7 @@ namespace Intrusion.Tests.Helpers
 		public method AddProfession(
     		"_type" as ProfessionType,
     		"_name" as String,
+    		"_requiredTechnology" as Technology,
     		"_maxGroupsCount" as Scalar,
     		"_minGroupSize" as Scalar,
     		"_maxGroupSize" as Scalar,
@@ -74,7 +74,7 @@ namespace Intrusion.Tests.Helpers
     		"_markerTypeFriendly" as String,
     		"_markerTypeEnemy" as String)
     	{
-    		_mProfessions pushBack [_type, _name, _maxGroupsCount, _minGroupSize, _maxGroupSize, _maxUnitsPerVehicle, _vehicleRevealsProfessionType, _markerTypeFriendly, _markerTypeEnemy] new Profession;
+    		_mProfessions pushBack [_type, _name, _requiredTechnology, _maxGroupsCount, _minGroupSize, _maxGroupSize, _maxUnitsPerVehicle, _vehicleRevealsProfessionType, _markerTypeFriendly, _markerTypeEnemy] new Profession;
     	};
 	};
 };

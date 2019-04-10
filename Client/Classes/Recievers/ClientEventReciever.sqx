@@ -153,6 +153,11 @@ namespace Intrusion.Client
 					};
 				};
 			};
+			
+			// If anyone in the player's group respawned, punish them all...!
+			if (group _player == group player) then {
+				ClientState.RatingLock = [(call Functions.GetMissionTime) + 5 * 60, RatingLockReason.Respawn] new RatingLock;
+			};
 		
 			call GroupActionHandler.UpdateAllInvitePlayerActions;
 			call IntrusionMenuHandler.UpdateVisibleOptions;
@@ -168,6 +173,13 @@ namespace Intrusion.Client
 			
 			if (_group == group player) then {
 				[_vehicles] call gClient.ClientVehicleHandler.AddGroupMarkerToVehicles;
+			};
+		};
+		
+		public static method OnAddSquadRating("_rating" as Scalar, "_group" as Group)
+		{
+			if (_group == group player) then {
+				[_rating, _group] call ClientSquadHandler.AddSquadRating;
 			};
 		};
 	};

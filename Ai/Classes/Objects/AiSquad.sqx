@@ -19,14 +19,17 @@ namespace Intrusion.Ai
 	{
 		private fields ["_mMapMarkerInfo" as MapMarkerInfo, "_mVehicle" as Object, "_mCurrentOrder" as Order, "_mVehicleSpawner" as IVehicleSpawner];
 		private fields ["_mState" as AiSquadState, "_mCurrentActionTimeoutTime" as Scalar, "_mUnit" as Object, "_mResourceLocation" as ResourceLocation, "_mUnitInfo" as AiUnitInfo];
-		private fields ["_mVehicleIsSquadVehicle" as Boolean, "_mMovingToPos" as Array, "_mLastPos" as Array, "_mLastPosTime" as Scalar];
+		private fields ["_mVehicleIsSquadVehicle" as Boolean, "_mMovingToPos" as Array, "_mLastPos" as Array, "_mLastPosTime" as Scalar, "_mResourceLocationHandler" as IResourceLocationHandler];
+		private fields ["_mInventedTechnologiesCollection" as InventedTechnologiesCollection];
 		
 		// Creates an AiSquad object.
 		// _noOfUnits (Scalar): Number of units to spawn.
-		public constructor("_unitsConfig" as IAiUnitsConfig, "_mapMarkersConfig" as IMapMarkersConfig, "_vehicleSpawner" as IVehicleSpawner, "_side" as Side, "_noOfUnits" as Scalar, "_skillLevel" as SkillLevel)
+		public constructor("_unitsConfig" as IAiUnitsConfig, "_resourceLocationHandler" as IResourceLocationHandler, "_mapMarkersConfig" as IMapMarkersConfig, "_vehicleSpawner" as IVehicleSpawner, "_side" as Side, "_noOfUnits" as Scalar, "_skillLevel" as SkillLevel, "_inventedTechnologiesCollection" as InventedTechnologiesCollection)
 		{
+			_mResourceLocationHandler = _resourceLocationHandler;
 			_mMapMarkerInfo = [_side] call _mapMarkersConfig.GetMapMarkerInfo;
 			_mVehicleSpawner = _vehicleSpawner;
+			_mInventedTechnologiesCollection = _inventedTechnologiesCollection;
 			_mUnitInfo = [_side] call _unitsConfig.GetUnitInfo;
 			_self.Group = createGroup _side;
 			_mState = AiSquadState.Idle;
@@ -44,9 +47,9 @@ namespace Intrusion.Ai
 				_mUnitInfo.UnitClassName createUnit [getMarkerPos _mMapMarkerInfo.BaseMarkerName, _self.Group];
 			};
 			
+			_self.Members = [];
 			{
 				_x setSkill ([_skillLevel] call SkillLevelMeta.SkillToScalar);
-				_x setVariable ["IsAiUnit", true];
 				_self.Members pushBack _x;
 			} foreach units _self.Group;
 		};
@@ -106,7 +109,7 @@ namespace Intrusion.Ai
 			if (MissionCounterService.RemainingMinutes <= 12) then {
 //				player sideChat "less than 12!";
 				
-				_location = ResourceLocationHandler.WinnersLocation;
+				_location = _mResourceLocationHandler.WinnersLocation;
 				
 				if (isNull _mResourceLocation || {_location.MarkerName != _mResourceLocation.MarkerName}) then {
 					_mResourceLocation = _location;
@@ -469,18 +472,26 @@ namespace Intrusion.Ai
 				
 				{
 					_x setDamage 1;
-					_x setVariable ["IsAiUnit", false];
 				} foreach _oldUnits;
 				
 				(_oldUnits) joinSilent grpNull;
 				
 				_self.Members = units _self.Group;
 				
-				{
-					_x setVariable ["IsAiUnit", true];
-				} foreach _self.Members;
-				
 				[_self.Group] call WaypointHelper.DeleteAllWaypointsFromGroup;
+				
+				// Check if launchers are invented, and in that case equip AI with launchers.
+				if ([side _self.Group, Technology.Ordnance] call _mInventedTechnologiesCollection.SideTechnologyIsInvented) then
+				{
+					{
+						if (random 100 > 33) then {
+							_x addBackpack "B_Kitbag_cbr";
+							(unitBackpack _x) addMagazineCargo ["NLAW_F", 1];
+							_x addWeapon "launch_NLAW_F";
+						};
+					} foreach _self.Members as Object;
+				};
+				
 				_mState = AiSquadState.Idle;
 			};
 		};

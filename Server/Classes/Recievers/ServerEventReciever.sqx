@@ -45,7 +45,8 @@ namespace Intrusion.Server
 			};
 		};
 		
-		// Called when a JIP player entered the game.
+		// Called when a JIP player entered the game - i.e. got its player unit in the mission.
+		// _player (Object): The unit of the player that entered.
 		public static method OnJipPlayerEnteredGame("_player" as Object)
 		{
 			[_player] call gServer.SquadHandler.AddRatingEventHandlerToPlayer;
@@ -53,8 +54,17 @@ namespace Intrusion.Server
 		
 		public static method OnFlagCaptured("_flag" as Object, "_markerName" as String, "_capturedBySide" as Side, "_capturedByUnit" as Object)
 		{
-			[_markerName, _capturedBySide] call ResourceLocationHandler.SetNewFlagOwner;
+			[_markerName, _capturedBySide] call gServer.ResourceLocationHandler.SetNewFlagOwner;
 			["ClientEventReciever.OnAddSquadRating", [200, group _capturedByUnit]] call Remote.Invoke;
+		};
+		
+		// Called when mission time is up.
+		public static method OnMissionTimeIsUp()
+		{
+			// If the server is dedicated, we need to end the mission on the server (otherwise it is done for the server's client).
+			if (isDedicated) then {
+				["END1"] spawn BIS_fnc_endMission;
+			};
 		};
 	};
 };

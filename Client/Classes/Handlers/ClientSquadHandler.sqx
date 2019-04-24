@@ -70,5 +70,28 @@ namespace Intrusion.Client
 				};
 			};
 		};
+		
+		// Change unit uniform.
+		// _unit (Object): The unit to change dress on.
+		// _role (String): Role in vehicle.
+		// _vehicle (Object): The vehicle that the unit entered.
+		public static method SetUniform(
+			"_unit" as Object,
+			"_role" as String,
+			"_vehicle" as IntrusionVehicle)
+		{
+			private ["_professionType" as ProfessionType, "_uniformItems" as Array, "_uniformInfo" as UniformInfo];
+			_professionType = _vehicle.OwnerProfession;
+			_uniformItems = uniformItems _unit;
+			
+			_uniformInfo = [side _unit, _professionType, [_role] call VehicleRoleMeta.fromString] call gCommon.UniformConfig.GetUniformInfo;
+			_unit addUniform _uniformInfo.Uniform;
+			_unit addHeadgear _uniformInfo.Helmet;
+			
+			// Restore items/magazines etc to this units new uniform
+			{
+				_unit addItemToUniform _x;
+			} forEach _uniformItems;
+		};
 	};
 };

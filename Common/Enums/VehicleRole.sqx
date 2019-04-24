@@ -33,5 +33,20 @@ namespace Intrusion.Common
 			
 			_sRole
 		};
+		
+		public static method fromString("_sRole" as String)
+		{
+			private ["_vehicleRole" as VehicleRole];
+			
+			_vehicleRole = VehicleRole.Undefined;
+			
+			switch (_sRole) do {
+				case "DRIVER": { _vehicleRole = VehicleRole.Driver; };
+				case "GUNNER": { _vehicleRole = VehicleRole.Gunner; };
+				case "CARGO": { _vehicleRole = VehicleRole.Cargo; };
+			};
+			
+			_vehicleRole
+		};
 	};
 };

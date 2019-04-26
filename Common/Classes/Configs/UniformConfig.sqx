@@ -27,6 +27,7 @@ namespace Intrusion.Common
 			_mUniformInfos pushBack [west, "U_B_GhillieSuit", "H_HelmetB_sand", ProfessionType.Sniper] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetSpec_B", ProfessionType.AntiArmor] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam_vest", "H_HelmetCrew_B", ProfessionType.Mechanized] new UniformInfo;
+				_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetB", ProfessionType.Mechanized, VehicleRole.Cargo] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam_vest", "H_HelmetCrew_B", ProfessionType.Armored] new UniformInfo;
 			
 			// East
@@ -40,6 +41,7 @@ namespace Intrusion.Common
 			_mUniformInfos pushBack [east, "U_O_GhillieSuit", "H_HelmetO_ocamo", ProfessionType.Sniper] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_O_SpecopsUniform_blk", "H_HelmetO_ocamo", ProfessionType.AntiArmor] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_O_SpecopsUniform_blk", "H_HelmetCrew_O", ProfessionType.Mechanized] new UniformInfo;
+				_mUniformInfos pushBack [east, "U_O_CombatUniform_ocamo", "H_HelmetO_ocamo", ProfessionType.Mechanized, VehicleRole.Cargo] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_O_CombatUniform_ocamo", "H_HelmetCrew_O", ProfessionType.Armored] new UniformInfo;
 		};
 		

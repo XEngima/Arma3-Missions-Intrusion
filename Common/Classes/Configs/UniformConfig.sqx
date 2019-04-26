@@ -19,6 +19,7 @@ namespace Intrusion.Common
 			
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetB", ProfessionType.Infantry] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam_tshirt", "H_HelmetB_grass", ProfessionType.Transport] new UniformInfo;
+				_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetB", ProfessionType.Transport, VehicleRole.Cargo] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam_tshirt", "H_HelmetB_grass", ProfessionType.Fuel] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetB_grass", ProfessionType.Ammo] new UniformInfo;
 			_mUniformInfos pushBack [west, "U_B_CombatUniform_mcam", "H_HelmetB_light_sand", ProfessionType.Repair] new UniformInfo;
@@ -33,6 +34,7 @@ namespace Intrusion.Common
 			// East
 			_mUniformInfos pushBack [east, "U_O_CombatUniform_ocamo", "H_HelmetO_ocamo", ProfessionType.Infantry] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_I_CombatUniform_tshirt", "H_HelmetO_ocamo", ProfessionType.Transport] new UniformInfo;
+				_mUniformInfos pushBack [east, "U_O_CombatUniform_ocamo", "H_HelmetO_ocamo", ProfessionType.Transport, VehicleRole.Cargo] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_I_CombatUniform_tshirt", "H_HelmetO_ocamo", ProfessionType.Fuel] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_O_CombatUniform_oucamo", "H_HelmetO_ocamo", ProfessionType.Ammo] new UniformInfo;
 			_mUniformInfos pushBack [east, "U_O_CombatUniform_oucamo", "H_HelmetO_ocamo", ProfessionType.Repair] new UniformInfo;

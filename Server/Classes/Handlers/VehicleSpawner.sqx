@@ -243,19 +243,52 @@ namespace Intrusion.Server
 		// Returns (Array): A list of IntrusionVehicle objects.
 		public method Array GetAllVehicles()
 		{
-			+_mAllIntrusionVehicles;
+			_mAllIntrusionVehicles
 		};
 		
+		// Deletes all profession vehicles that have no owner on a side.
+		// _side (Side): The side to delete vehicles from.
+		// Returns (Scalar): The total production value of the deleted vehicles.
+		public method Scalar DeleteProfessionVehiclesWithNoOwner("_side" as Side)
+		{
+			private ["_intrusionVehiclesToKeep" as Array, "_totalCost" as Scalar, "_vehicleDeleted" as Boolean];
+			
+			_intrusionVehiclesToKeep = [];
+			_totalCost = 0;
+			_vehicleDeleted = false;
+			
+			{
+				if (alive _x.Vehicle && _x.Side == _side && _x.OwnerProfession != ProfessionType.Undefined && (isNull _x.OwnerGroup || count units _x.OwnerGroup == 0)) then {
+					_totalCost = _totalCost + floor (_totalCost * (1 - (damage _x.Vehicle)));
+					[_x.Vehicle] spawn _self.DeleteVehicleWhenEmpty;
+					_vehicleDeleted = true;
+				}
+				else {
+					_intrusionVehiclesToKeep pushBack _x;
+				};
+			} foreach _mAllIntrusionVehicles as IntrusionVehicle;
+			
+			if (_vehicleDeleted) then {
+				_mAllIntrusionVehicles = _intrusionVehiclesToKeep;
+			};
+			
+			_totalCost
+		};
+		
+		// Removes ownership of all destroyed squad vehicles and leaves them on the field.
 		public method RemoveOwnershipOfDestroyedVehicles()
 		{
-			private ["_collectionModified" as Boolean];
+			private ["_collectionModified" as Boolean, "_losingVehicleGroup" as Group];
 			
 			_collectionModified = false;
 			
 			{
 				if (!alive _x.Vehicle && !isNull _x.OwnerGroup) then {
 		        	["Deleting ownership of destroyed profession vehicle:" + str _x] call LogHandler.Debug;
+		        	_losingVehicleGroup = _x.OwnerGroup;
 					call _x.RemoveOwnership;
+					
+					["ClientEventReciever.OnGroupLostSquadVehicle", [_losingVehicleGroup, _x.Vehicle]] call Remote.Invoke;
 					_collectionModified = true;
 				};
 			} foreach _mAllIntrusionVehicles as IntrusionVehicle;

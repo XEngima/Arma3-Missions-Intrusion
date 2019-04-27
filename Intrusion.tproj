@@ -19,9 +19,17 @@
                         <IsSelected>false</IsSelected>
                         <SubNodes />
                       </ProjectNodeViewModel>
+                      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="IAiWeaponsConfig.sqx" IsExpanded="false" FileName="Ai\Classes\Configs\Interfaces\IAiWeaponsConfig.sqx">
+                        <IsSelected>false</IsSelected>
+                        <SubNodes />
+                      </ProjectNodeViewModel>
                     </SubNodes>
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="AiUnitsConfig.sqx" IsExpanded="false" FileName="Ai\Classes\Configs\AiUnitsConfig.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="AiWeaponsConfig.sqx" IsExpanded="false" FileName="Ai\Classes\Configs\AiWeaponsConfig.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
@@ -66,6 +74,10 @@
                     <SubNodes />
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="AiUnitInfo.sqx" IsExpanded="false" FileName="Ai\Classes\Objects\AiUnitInfo.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="AiWeaponInfo.sqx" IsExpanded="false" FileName="Ai\Classes\Objects\AiWeaponInfo.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
@@ -327,6 +339,10 @@
                         <IsSelected>false</IsSelected>
                         <SubNodes />
                       </ProjectNodeViewModel>
+                      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="IRatingConfig.sqx" IsExpanded="false" FileName="Common\Classes\Configs\Interfaces\IRatingConfig.sqx">
+                        <IsSelected>false</IsSelected>
+                        <SubNodes />
+                      </ProjectNodeViewModel>
                       <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="ISquadConfig.sqx" IsExpanded="false" FileName="Common\Classes\Configs\Interfaces\ISquadConfig.sqx">
                         <IsSelected>false</IsSelected>
                         <SubNodes />
@@ -373,6 +389,10 @@
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="RatingConfig.sqx" IsExpanded="false" FileName="Common\Classes\Configs\RatingConfig.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="ReleaseSettings.sqx" IsExpanded="false" FileName="Common\Classes\Configs\ReleaseSettings.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
@@ -390,6 +410,10 @@
                     <SubNodes />
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="TechnologyTestConfig.sqx" IsExpanded="false" FileName="Common\Classes\Configs\TechnologyTestConfig.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="UniformConfig.sqx" IsExpanded="false" FileName="Common\Classes\Configs\UniformConfig.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
@@ -489,6 +513,10 @@
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="RatingCalculator.sqx" IsExpanded="false" FileName="Common\Classes\Objects\RatingCalculator.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="RatingLock.sqx" IsExpanded="false" FileName="Common\Classes\Objects\RatingLock.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
@@ -518,6 +546,10 @@
                     <SubNodes />
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="TechnologyInfo.sqx" IsExpanded="false" FileName="Common\Classes\Objects\TechnologyInfo.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="UniformInfo.sqx" IsExpanded="false" FileName="Common\Classes\Objects\UniformInfo.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
@@ -591,6 +623,10 @@
                 <SubNodes />
               </ProjectNodeViewModel>
               <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Technology.sqx" IsExpanded="false" FileName="Common\Enums\Technology.sqx">
+                <IsSelected>false</IsSelected>
+                <SubNodes />
+              </ProjectNodeViewModel>
+              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="VehicleRole.sqx" IsExpanded="false" FileName="Common\Enums\VehicleRole.sqx">
                 <IsSelected>false</IsSelected>
                 <SubNodes />
               </ProjectNodeViewModel>
@@ -762,6 +798,10 @@
                         <IsSelected>false</IsSelected>
                         <SubNodes />
                       </ProjectNodeViewModel>
+                      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="IVehicleSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Handlers\Interfaces\IVehicleSpawner.sqx">
+                        <IsSelected>false</IsSelected>
+                        <SubNodes />
+                      </ProjectNodeViewModel>
                     </SubNodes>
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="BrigadeLeadershipHandler.sqx" IsExpanded="false" FileName="Server\Classes\Handlers\BrigadeLeadershipHandler.sqx">
@@ -788,6 +828,10 @@
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="VehicleSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Handlers\VehicleSpawner.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
                 </SubNodes>
               </ProjectNodeViewModel>
               <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Objects" IsExpanded="false" FileName="Server\Classes\Objects">
@@ -808,7 +852,7 @@
                         <IsSelected>false</IsSelected>
                         <SubNodes />
                       </ProjectNodeViewModel>
-                      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="IVehicleSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Objects\Interfaces\IVehicleSpawner.sqx">
+                      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="IUnitSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Objects\Interfaces\IUnitSpawner.sqx">
                         <IsSelected>false</IsSelected>
                         <SubNodes />
                       </ProjectNodeViewModel>
@@ -862,6 +906,10 @@
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="UnitSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Objects\UnitSpawner.sqx">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="WeaponBox.sqx" IsExpanded="false" FileName="Server\Classes\Objects\WeaponBox.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
@@ -871,10 +919,6 @@
                     <SubNodes />
                   </ProjectNodeViewModel>
                   <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="WeaponInfo.sqx" IsExpanded="false" FileName="Server\Classes\Objects\WeaponInfo.sqx">
-                    <IsSelected>false</IsSelected>
-                    <SubNodes />
-                  </ProjectNodeViewModel>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="VehicleSpawner.sqx" IsExpanded="false" FileName="Server\Classes\Objects\VehicleSpawner.sqx">
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>

@@ -19,7 +19,8 @@ namespace Intrusion.Server
 		private static fields ["_mProfessionChangeListeners" as Array /* of Code */, "_mProfessionConfig" as IProfessionConfig];
 		
 		// Creates a SquadHandler object.
-		public constructor("_vehicleSpawner" as IVehicleSpawner, "_professionConfig" as IProfessionConfig) {
+		public constructor("_vehicleSpawner" as IVehicleSpawner, "_professionConfig" as IProfessionConfig)
+		{
 			_mVehicleSpawner = _vehicleSpawner;
 			_mSquadCollection = new SquadCollection;
 			_mProfessionChangeListeners = [];
@@ -170,20 +171,6 @@ namespace Intrusion.Server
 				} foreach units _group as Object;
 			};
 */
-		};
-		
-		// Adds a rating event handler to a player.
-		// _player (Object): The player to add the rating event handler to.
-		public method AddRatingEventHandlerToPlayer("_player" as Object)
-		{
-			_player addEventHandler ["HandleRating", {
-				params ["_unit" as Object, "_rating" as Scalar];
-				
-				["ClientEventReciever.OnAddSquadRating", [_rating, group _unit]] call Remote.Invoke;
-				//[_rating, group _unit] call gServer.SquadHandler.AddRatingToSquad;
-				
-				0
-			}];
 		};
 		
 		public method LogContent()

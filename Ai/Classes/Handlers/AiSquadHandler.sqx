@@ -7,6 +7,9 @@
  * Description:
  * Handles all AI squads.
  */
+
+using Intrusion.Common;
+
 namespace Intrusion.Ai
 {
 	public class AiSquadHandler : IAiSquadHandler
@@ -16,7 +19,15 @@ namespace Intrusion.Ai
 		// Creates a AiSquadHandler object.
 		public constructor {
 			_mSquads = [];
+			
+			_self.AiWarriorTypes = [
+				ProfessionType.Motorized,
+				ProfessionType.Mechanized,
+				ProfessionType.Armored,
+			];
 		};
+		
+		public static property Array AiWarriorTypes { get; private set; };
 		
 		// Adds an AI squad to the AI squad handler.
 		// _aiSquad (AiSquad): The AI squad to add.
@@ -63,6 +74,21 @@ namespace Intrusion.Ai
 		public method Array GetAllSquads()
 		{
 			_mSquads
+		};
+		
+		// Gives a new order to an AI group.
+		// _group (Group): The group to recieve the order.
+		// _order (Order): The order.
+		public method GiveOrderToGroup("_group" as Group, "_order" as Order)
+		{
+			scopeName "main";
+			
+			{
+				if (_x.Group == _group) then {
+					[_order] call _x.GiveOrder;
+					breakOut "main";
+				};
+			} foreach _mSquads as AiSquad;
 		};
 	};
 };

@@ -1,5 +1,5 @@
 /*
- * Name:	TechnologyProdConfig
+ * Name:	TechnologyConfig
  * Date:	2018-12-17
  * Version: 1.0
  * Author:  Engima
@@ -9,29 +9,28 @@
  */
 namespace Intrusion.Common
 {
-	public class TechnologyProdConfig : ITechnologyConfig
+	public class TechnologyConfig : ITechnologyConfig
 	{
-		private fields ["_mTechnologies" as Array /* of TechnologyInfo */];
-		
 		// Creates a TechnologyConfig object.
 		public constructor {
 			// Must match the order in TechnologyEnum.
-			_mTechnologies = [
+			_self.Technologies = [
 				[Technology.Transport, "Transport", 25] new TechnologyInfo,
 				[Technology.Services, "Services", 50] new TechnologyInfo,
 				[Technology.Maintenance, "Maintenance", 75] new TechnologyInfo,
-				[Technology.Ordnance, "Ordnance", 300] new TechnologyInfo,
-				[Technology.Motorized, "Motorized Vehicles", 350] new TechnologyInfo,
+				[Technology.Ordnance, "Ordnance", 250] new TechnologyInfo,
+				[Technology.Motorized, "Motorized Vehicles", 300] new TechnologyInfo,
+				[Technology.AntiAir, "Anti Air", 375] new TechnologyInfo,
+				[Technology.AirRecon, "Air Recon", 400] new TechnologyInfo,
 				[Technology.LightArmor, "Light Armor", 500] new TechnologyInfo,
-				[Technology.Artillery, "Artillery", 600] new TechnologyInfo,
-				[Technology.HeavyArmor, "Heavy Armor", 750] new TechnologyInfo,
+				[Technology.Artillery, "Artillery", 575] new TechnologyInfo,
+				[Technology.HeavyArmor, "Heavy Armor", 650] new TechnologyInfo,
+				[Technology.AirArmed, "Armed Air Units", 750] new TechnologyInfo,
 			];
-			
-			_self.Technologies = +_mTechnologies;
 		};
 		
-		// Gets a copy of all technologies.
-		public property Array Technologies { get; private set; };
+		// Gets all technologies.
+		public property Array Technologies { get; protected set; };
 		
 		// Gets a profession vehicle from the list.
 		// Returns (ProfessionVehicle): A profession vehicle. classNull if the vehicle type does not exist.
@@ -42,7 +41,7 @@ namespace Intrusion.Common
 				if (_technology == _x.Technology) then {
 					_x breakOut "main";
 				};
-			} foreach _mTechnologies as TechnologyInfo;
+			} foreach _self.Technologies as TechnologyInfo;
 			
 			classNull
 		};
@@ -58,7 +57,7 @@ namespace Intrusion.Common
 				if (_x.RequiredResearch > _research) then {
 					_x breakOut "main";
 				};
-			} foreach _mTechnologies as TechnologyInfo;
+			} foreach _self.Technologies as TechnologyInfo;
 			
 			classNull
 		};

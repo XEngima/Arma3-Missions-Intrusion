@@ -1,0 +1,182 @@
+/*
+ * Name:	ActionPerformer
+ * Date:	2019-05-19
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Makes actions happen in the world.
+ */
+
+using Sqx.Waypoints;
+using Intrusion.Server;
+using Intrusion.Common;
+
+namespace Intrusion.Ai
+{
+	public class ActionPerformer : IActionPerformer
+	{
+		private fields ["_mGroup" as Group, "_mUnitSpawner" as IUnitSpawner, "_mUnitInfo" as AiUnitInfo];
+		
+		// Creates a ActionManager object.
+		public constructor("_group" as Group, "_resourceLocationHandler" as IResourceLocationHandler, "_unitSpawner" as IUnitSpawner, "_unitsConfig" as IAiUnitsConfig)
+		{
+			_mGroup = _group;
+			_mUnitSpawner = _unitSpawner;
+			
+			_mUnitInfo = [side _group] call _unitsConfig.GetUnitInfo;
+		};
+		
+		// Performs a move action for an AI group.
+		// _group (Group): The group to move.
+		// _moveAction (MoveAction): Information about the movement.
+		public method DoMove("_moveAction" as MoveAction)
+		{
+			private ["_waypoint" as Array];
+			
+			[_mGroup] call WaypointHelper.DeleteAllWaypointsFromGroup;
+			
+			_waypoint = _mGroup addWaypoint [_moveAction.Position, 10];
+			
+			_waypoint setWaypointSpeed _moveAction.SpeedMode;
+			_waypoint setWaypointType _moveAction.WaypointType;
+			_waypoint setWaypointCombatMode "YELLOW";
+			_waypoint setWaypointBehaviour "SAFE";
+			
+			_mGroup setSpeedMode _moveAction.SpeedMode;
+			_mGroup setCombatMode "YELLOW";
+			_mGroup setBehaviour "SAFE";
+			
+			//player sideChat "expected: " + _moveAction.SpeedMode; // TODO SQX: Semicolon disappears on build.
+		};
+		
+		// Performs a capture action for an AI group.
+		// _group (Group): The group to capture a location.
+		// _moveAction (MoveAction): Information about the movement.
+		public method DoCapture("_captureAction" as CaptureAction)
+		{
+			private ["_waypoint" as Array];
+			
+			[_mGroup] call WaypointHelper.DeleteAllWaypointsFromGroup;
+			
+			_waypoint = _mGroup addWaypoint [_captureAction.Position, 10];
+			_waypoint setWaypointSpeed "LIMITED";
+			_waypoint setWaypointCombatMode "YELLOW";
+			_waypoint setWaypointBehaviour "AWARE";
+			_waypoint setWaypointType "SAD";
+			
+			_mGroup setSpeedMode "LIMITED";
+			_mGroup setCombatMode "YELLOW";
+			_mGroup setBehaviour "AWARE";
+		};		
+		
+		// Performs a mount action for an AI group.
+		// _group (Group): The group to capture a location.
+		// _mountAction (MountAction): Information about the mounting.
+		public method DoMount("_mountAction" as MountAction)
+		{
+			{
+				if (isNull (assignedVehicle _x) && isNull (assignedDriver _mountAction.Vehicle.Vehicle)) then {
+					_x assignAsDriver _mountAction.Vehicle.Vehicle;
+					[_x] orderGetIn true;
+				};
+				
+				if (isNull (assignedVehicle _x) && isNull (assignedCommander _mountAction.Vehicle.Vehicle)) then {
+					_x assignAsCommander _mountAction.Vehicle.Vehicle;
+					[_x] orderGetIn true;
+				};
+				
+				if (isNull (assignedVehicle _x) && isNull (assignedGunner _mountAction.Vehicle.Vehicle)) then {
+					_x assignAsGunner _mountAction.Vehicle.Vehicle;
+					[_x] orderGetIn true;
+				};
+				
+				if (isNull (assignedVehicle _x)) then {
+					_x assignAsCargo _mountAction.Vehicle.Vehicle;
+					[_x] orderGetIn true;
+				};
+			} foreach units _mGroup;
+		};
+		
+		// Performs a disembark action for an AI group.
+		// _disembarkAction (DisembarkAction): Information about the disembarkment.
+		public method DoDisembark("_disembarkAction" as DisembarkAction)
+		{
+			call _disembarkAction.Service.RunAsync;
+		};
+		
+		
+		// Limits the speed of a vehicle.
+		// _vehicle (Vehicle): The vehicle to have a limited speed.
+		// _speed (Scalar): The speed to set.
+		public method ForceSpeed("_vehicle" as Object, "_speed" as Scalar)
+		{
+			_vehicle forceSpeed _speed;
+		};
+		
+		// Moves the members of a group out of its vehicles and unassigns them immediately.
+		// _group (Group): The group to move out.
+		public method MoveOutFromVehicle("_group" as Group)
+		{
+			{
+				private _vehicle = vehicle _x;
+				
+				if (_vehicle != _x) then {
+					unassignVehicle _x;
+					moveOut _x;
+					_x action ["GetOut", _vehicle]
+				};
+			} foreach units _group as Object;
+			
+			//units _group allowGetIn false; // Forces the units out of the vehicle
+			//units _group allowGetIn true;  // Allows the units to reenter vehicle later
+		};
+		
+		// Respawns a squad at base. Creates new units and removes the old (if alive).
+		// _group (Group): The group to respawn.
+		// _members (Array of IUnitContainer): The squad's members.
+		// _baseMarkerName (String): The marker name of the group's base.
+		// Returns (Array of IUnitContainer): All new units.
+		public method Array RespawnAiSquad("_group" as Group, "_members" as Array, "_baseMarkerName" as String)
+		{
+			private ["_oldUnits" as Array, "_newUnits" as Array, "_unit" as Object];
+			
+			_oldUnits = [];
+			_newUnits = [];
+			
+			// Remove any current waypoint
+			[_group] call WaypointHelper.DeleteAllWaypointsFromGroup;
+			
+			// Create new units at base
+			{
+				_oldUnits pushBack _x.Unit;
+				
+				_unit = [_mUnitInfo.UnitClassName, getMarkerPos _baseMarkerName, _group] call _mUnitSpawner.CreateUnit;
+				_newUnits pushBack [_unit] new UnitContainer;
+			} foreach _members as IUnitContainer;
+			
+			// Make sure none of the old units belong to the group
+			(_oldUnits) joinSilent grpNull;
+			
+			// Make sure the old units are dead or removed.
+			{
+				if (alive _x) then {
+					deleteVehicle _x;
+				};
+			} foreach _oldUnits as Object;
+			
+			_newUnits
+		};
+		
+		// Equips an AI squad member with a backpack and a launcher.
+		// _member (IUnitContainer): The member to equip.
+		// _launcherClassName (String): The class name of the launcher.
+		// _ammoClassName (String): The class name of the launcher's ammo.
+		public method EquipMemberWithLauncher("_member" as IUnitContainer, "_launcherClassName" as String, "_ammoClassName" as String)
+		{
+			_member.Unit addBackpack "B_Kitbag_cbr";
+			(unitBackpack _member.Unit) addMagazineCargo [_ammoClassName, 1];
+			_member.Unit addWeapon _launcherClassName;
+		};
+	};
+};

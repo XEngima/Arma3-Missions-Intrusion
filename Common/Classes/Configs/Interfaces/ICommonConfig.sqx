@@ -18,12 +18,15 @@ namespace Intrusion.Common
 		property ITechnologyConfig Technology { get; };
 		
 		// Gets the profession configs.
-		property IProfessionConfig Professions { get; };
+		property ProfessionConfig Professions { get; };
 		
 		// Gets the vehicle class names config.
 		property IVehicleClassNamesConfig VehicleClassNames { get; };
 		
 		// Gets the profession vehicles config.
 		property IProfessionVehiclesConfig ProfessionVehicles { get; };
+		
+		// Gets the base config.
+		property BaseConfig BaseConfig { get; private set; };
 	};
 };

@@ -46,7 +46,7 @@ namespace Intrusion.Tests.Helpers
 			[]
 		};
 		
-		public method PlaceVehicleOnCarPark("_vehicle" as Object, "_side" as Side)
+		public method PlaceVehicleOnCarPark("_vehicle" as Object, "_side" as Side, ["_pos" as Array, []])
 		{
 		};
 		
@@ -63,16 +63,28 @@ namespace Intrusion.Tests.Helpers
 			[]
 		};
 		
+		public method IntrusionVehicle GetIntrusionVehicleByGroup("_group" as Group)
+		{
+			return classNull;
+		};
+		
 		// Gets the nearest working empty free vehicle in relation to a position.
 		// _side (Side): The vehicle's side.
 		// _pos (Array): The relative position.
+		// _requiredCrewPlacesCount (Scalar): Required number of crew places.
 		// Returns (IntrusionVehicle): The intrusion vehicle closest to the group.
-		public method IntrusionVehicle GetNearestEmptyFreeVehicle("_side" as Side, "_pos" as Array)
+		public method IntrusionVehicle GetNearestEmptyFreeVehicle("_side" as Side, "_pos" as Array, "_requiredCrewPlacesCount" as Scalar)
 		{
 			classNull
 		};
 		
 		public method Scalar DeleteProfessionVehiclesWithNoOwner("_side" as Side)
+		{
+		};
+		
+		// Removes the information about helipads for a side.
+		// _side (Side): The side's helipad information to remove.
+		public method RemoveSidesHelipads("_side" as Side)
 		{
 		};
 	};

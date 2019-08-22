@@ -30,7 +30,7 @@ namespace Intrusion.Server
 		method Scalar DeleteProfessionVehicles("_group" as Group);
 		
 		// Places an existing vehicle on a side's car park.
-		method PlaceVehicleOnCarPark("_vehicle" as Object, "_side" as Side);
+		method PlaceVehicleOnCarPark("_vehicle" as Object, "_side" as Side, ["_pos" as Array, []]);
 		
 		// Gets all spawned vehicles.
 		// Returns (Array): A list of IntrusionVehicle objects.
@@ -44,15 +44,25 @@ namespace Intrusion.Server
 		// Returns (Array of IntrusionVehicle): A list of the squad's intrusion vehicles.
 		method Array GetIntrusionVehiclesByGroup("_group" as Group);
 		
+		// Gets a squad's intrusion vehicle.
+		// _group (Group): The group that owns the vehicle.
+		// Returns (IntrusionVehicle): The squad's vehicle. classNull if they don't have one.
+		method IntrusionVehicle GetIntrusionVehicleByGroup("_group" as Group);
+		
 		// Gets the nearest working empty free vehicle in relation to a position.
 		// _side (Side): The vehicle's side.
 		// _pos (Array): The relative position.
+		// _requiredCrewPlacesCount (Scalar): Required number of crew places.
 		// Returns (IntrusionVehicle): The intrusion vehicle closest to the group.
-		method IntrusionVehicle GetNearestEmptyFreeVehicle("_side" as Side, "_pos" as Array);
+		method IntrusionVehicle GetNearestEmptyFreeVehicle("_side" as Side, "_pos" as Array, "_requiredCrewPlacesCount" as Scalar);
 		
 		// Deletes all profession vehicles that have no owner on a side.
 		// _side (Side): The side to delete vehicles from.
 		// Returns (Scalar): The total production value of the deleted vehicles.
 		method Scalar DeleteProfessionVehiclesWithNoOwner("_side" as Side);
+		
+		// Removes the information about helipads for a side.
+		// _side (Side): The side's helipad information to remove.
+		method RemoveSidesHelipads("_side" as Side);
 	};
 };

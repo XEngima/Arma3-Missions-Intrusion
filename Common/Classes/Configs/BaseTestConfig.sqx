@@ -1,0 +1,20 @@
+/*
+ * Name:	BaseTestConfig
+ * Date:	2019-02-01
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Contains all client non-side base configs.
+ */
+namespace Intrusion.Common
+{
+	public class BaseTestConfig : BaseConfig
+	{
+		// Creates a ClassNamesConfig object.
+		public constructor {
+			call _base.Constructor;
+			_self.TimeRequiredToMoveBase = 5;
+		};
+	};
+};

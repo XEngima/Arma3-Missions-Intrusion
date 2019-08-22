@@ -1,0 +1,305 @@
+/*
+ * Name:	DecisionMaker
+ * Date:	2019-07-23
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Models the frontal lobe of the brain that is the centre for decision making.
+ * This class is inherited by different squad brains with different perspective, like motorized, sharpshooter, air and naval.
+ */
+
+using Intrusion.Common;
+
+namespace Intrusion.Ai
+{
+	public class DecisionMaker : IDecisionMaker
+	{
+		#region Construction/Properties/Common
+	
+		public constructor("_time" as IMissionTime, "_knowledge" as Knowledge, "_actionServiceFactory" as IActionServiceFactory, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_markerHandler" as IMarkerHandler, "_actionTimeoutConfig" as IActionTimeoutConfig)
+		{
+    		["_actionServiceFactory91: " + str _actionServiceFactory] call LogHandler.Debug;
+			_self.Time = _time;
+			_self.Knowledge = _knowledge;
+			_self.ActionServiceFactory = _actionServiceFactory;
+			_self.World = _world;
+			_self.ActionPerformer = _actionPerformer;
+			_self.MarkerHandler = _markerHandler;
+			_self.ActionTimeoutConfig = _actionTimeoutConfig;
+			
+			_self.MoveCompletedIfMountedAndMiddleRangeOfTargetPosition = true;
+		};
+		
+		protected property IMissionTime Time { get; private set; };
+		protected property Knowledge Knowledge { get; private set; };
+		protected property IActionServiceFactory ActionServiceFactory { get; private set; };
+		protected property IWorld World { get; private set; };
+		protected property IActionPerformer ActionPerformer { get; private set; };
+		protected property IMarkerHandler MarkerHandler { get; private set; };
+		protected property IActionTimeoutConfig ActionTimeoutConfig { get; private set; };
+	
+		protected method SetState("_state" as AiSquadState, "_action" as IAction) 
+		{
+			_self.Knowledge.State = _state;
+			
+			if (_state == AiSquadState.Idle) then {
+				_self.Knowledge.CurrentAction = classNull;
+			}
+			else {
+				_self.Knowledge.CurrentAction = _action;
+			};
+			
+			player sideChat "Setting status for " + str _self.Knowledge.Group + " (" + str (count units _self.Knowledge.Group) + "): " + ([_state] call AiSquadStateMeta.ToString);
+		};
+	
+		#endregion
+	
+		#region Brain Events
+	
+		public virtual method OnTargetResourceLocationCaptured()
+		{
+		};
+		
+		// Called when enemies on the ground are spotted near.
+		// _enemyUnitContainer (IUnitContainer): The closest enemy unit.
+		// _mountedVehicleContainer (VehicleContainer): The vehicle that the (subject) AI squad is mounted to. classNull if not mounted.
+		public virtual method OnNearEnemiesOnGroundSpotted("_enemyContainer" as IUnitContainer, "_mountedVehicleContainer" as VehicleContainer)
+		{
+			private ["_actionService" as IActionService, "_time" as Scalar];
+			
+			if (isNull _mountedVehicleContainer) then
+			{
+				private _action = [(call _self.Time.GetMissionTime) + 20, (call _enemyContainer.GetPosition)] new EngageAction;
+				[AiSquadState.Engaging, _action] call _self.SetState;
+	        	["Engage action created: " + str _action] call LogHandler.Debug;
+	        }
+	        else {
+	        	_time = call _self.Time.GetMissionTime;
+	        	
+				_actionService = [_self.Time, _time + 20, _self.World, _self.ActionPerformer, _self.Knowledge.Group, _mountedVehicleContainer] call _self.ActionServiceFactory.CreateDisembarkService;
+				call _actionService.RunAsync;
+				
+				private _action = [_time + 20, _actionService as DisembarkActionService, _mountedVehicleContainer] new DisembarkAction;
+				
+				[AiSquadState.Disembarking, _action] call _self.SetState;
+	        	["Disembark action #2 created: " + str _action] call LogHandler.Debug;
+	        };
+		};
+		
+		public virtual method OnBoardCloseVehicle()
+		{
+			private _leaderPos = [_self.Knowledge.Group] call _self.World.GetLeaderPos;
+			
+			// If distance to target position is less than 150 meters, don't do anything.
+
+			if (_leaderPos distance _self.Knowledge.Order.TargetPosition <= 150) then
+			{
+				return;
+			};
+			
+			// Mount vehicle if there is one where they stand.
+			
+			private _squadInVehicle = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
+
+			if (!_squadInVehicle) then
+			{
+				private _side = side _self.Knowledge.Group;
+				private _leaderPos = [_self.Knowledge.Group] call _self.World.GetLeaderPos;
+				private _time = call _self.Time.GetMissionTime;
+			
+				private _aiVehicle = [_side, _leaderPos, count _self.Knowledge.Members] call _self.World.GetClosestEmptyFreeVehicle as VehicleContainer;
+				
+				if (!isNull _aiVehicle && { _aiVehicle.Position distance _leaderPos <= 20 }) then
+				{
+					private _action = [_time + 20, _aiVehicle] new MountAction;
+					[AiSquadState.MountingVehicle, _action] call _self.SetState;
+					[_action as MountAction] call _self.ActionPerformer.DoMount;
+		        	["Mount action created: " + str _action] call LogHandler.Debug;
+					breakOut "main";
+				};
+			};
+		};
+		
+		public virtual method OnLookForVehicle()
+		{
+			private _leaderPos = [_self.Knowledge.Group] call _self.World.GetLeaderPos;
+			
+			// If distance to target position is less than 150 meters, don't do anything.
+			
+			if (_leaderPos distance _self.Knowledge.Order.TargetPosition <= 150) then
+			{
+				return;
+			};
+			
+			// If distance to nearest free vehicle is relatively far, don't do anything.
+			
+			private _side = side _self.Knowledge.Group;
+			private _aiVehicle = [_side, _leaderPos, count _self.Knowledge.Members] call _self.World.GetClosestEmptyFreeVehicle as VehicleContainer;
+			
+			if (!isNull _aiVehicle) then
+			{
+				private _distanceToVehicle = _aiVehicle.Position distance _leaderPos as Scalar;
+				private _distanceToTargetPos = _self.Knowledge.Order.TargetPosition distance _leaderPos as Scalar;
+				
+	        	["_distanceToVehicle: " + str _distanceToVehicle] call LogHandler.Debug;
+	        	["_distanceToTargetPos: " + str _distanceToTargetPos] call LogHandler.Debug;
+
+				if ((_distanceToVehicle / _distanceToTargetPos) > 0.25) then {
+					return;
+				};
+			};
+			
+			// Otherwise, move to the free vehicle
+			
+			if (!isNull _aiVehicle) then
+			{
+				private _time = call _self.Time.GetMissionTime;
+				private _action = [_time + _self.ActionTimeoutConfig.MoveActionTimeout, _aiVehicle.Position, _self.Knowledge.Order.ResourceLocation.MarkerName, "NORMAL", "MOVE"] new MoveAction;
+				[AiSquadState.Moving, _action] call _self.SetState;
+				[_action as MoveAction] call _self.ActionPerformer.DoMove;
+	        	["Move action created #2: " + str _action] call LogHandler.Debug;
+			};
+		};
+		
+		// Called when the group is closing in on a destination (not necessary a location).
+		public virtual method OnClosingInOnDestination()
+		{
+			private _squadInVehicle = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
+			private _time = call _self.Time.GetMissionTime;
+			
+			if (_squadInVehicle) then
+			{
+				private _aiVehicle = [_self.Knowledge.Group] call _self.World.GetMountedVehicle;
+				private _actionService = [_self.Time, _time + 20, _self.World, _self.ActionPerformer, _self.Knowledge.Group, _aiVehicle] call _self.ActionServiceFactory.CreateDisembarkService as IActionService;
+				call _actionService.RunAsync;
+				
+				private _action = [_time + 20, _actionService as DisembarkActionService, _aiVehicle] new DisembarkAction;
+				[AiSquadState.Disembarking, _action] call _self.SetState;
+	        	["Disembark action created: " + str _action] call LogHandler.Debug;
+			};
+		};
+		
+		public virtual method OnPresentAtLocation("_location" as ResourceLocation)
+		{
+			private _side = side _self.Knowledge.Group;
+			
+			if (_location.Side != _side) then
+			{
+				private _time = call _self.Time.GetMissionTime;
+				private _pos = [_location.MarkerName] call _self.MarkerHandler.GetMarkerPos;
+				
+				private _action = [_time + _self.ActionTimeoutConfig.CaptureActionTimeout, _pos, _location.MarkerName] new CaptureAction;
+				[AiSquadState.Capturing, _action] call _self.SetState;
+				[_self.Knowledge.CurrentAction as CaptureAction] call _self.ActionPerformer.DoCapture;
+	        	["Capture action created: " + str _action] call LogHandler.Debug;
+			};
+		};
+		
+		public virtual method OnWithinWalkingDistanceFromTargetLocation("_location" as ResourceLocation)
+		{
+			private _time = call _self.Time.GetMissionTime;
+			private _squadInVehicle = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
+			
+			private _speedMode = "NORMAL";
+			if (_squadInVehicle) then {
+				_speedMode = "LIMITED";
+			};
+			
+			private _action = [_time + _self.ActionTimeoutConfig.MoveActionTimeout, _self.Knowledge.Order.TargetPosition, _location.MarkerName, _speedMode, "MOVE"] new MoveAction;
+			[AiSquadState.Moving, _action] call _self.SetState;
+			[_action as MoveAction] call _self.ActionPerformer.DoMove;
+        	["Move action created #1: " + str _action] call LogHandler.Debug;
+		};
+		
+		public virtual method OnAwayFromTargetPosition("_leaderPos" as Array, "_order" as Order)
+		{
+			private _locationMarkerName = "";
+			private _time = call _self.Time.GetMissionTime;
+			private _squadInVehicle = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
+			
+			if (!isNull _self.Knowledge.Order.ResourceLocation) then {
+				_locationMarkerName = _self.Knowledge.Order.ResourceLocation.MarkerName;
+			};
+			
+			private _speedMode = "NORMAL";
+			if (_squadInVehicle) then {
+				_speedMode = "LIMITED";
+			};
+			
+			private _action = [_time + _self.ActionTimeoutConfig.MoveActionTimeout, _self.Knowledge.Order.TargetPosition, _locationMarkerName, _speedMode, "MOVE"] new MoveAction;
+			[AiSquadState.Moving, _action] call _self.SetState;
+			[_self.Knowledge.CurrentAction as MoveAction] call _self.ActionPerformer.DoMove;
+        	["Move action created #3: " + str _action] call LogHandler.Debug;
+		};
+		
+		public virtual method OnNothingToDo()
+		{
+		};
+		
+		#endregion
+		
+		#region Completion
+		
+		// Gets whether the group completes a move action if it is mounted and encounters nearby enemies.
+		protected property Boolean MoveCompletedIfMountedAndMiddleRangeOfTargetPosition { get; set; };
+		
+		// Gets whether the group has completed a move action.
+		public virtual method Boolean HasCompletedMove()
+		{
+			private ["_moveAction" as MoveAction, "_leaderPos" as Array, "_squadInVehicle" as Boolean, "_unitContainer" as IUnitContainer];
+			private ["_location" as ResourceLocation, "_locationCollection" as ResourceLocationCollection, "_currentAction" as IAction];
+			
+			//if ((_mKnowledge.CurrentAction) is MoveAction) then // TODO SQX: Generates error that 'required variable before is'.
+			_currentAction = _self.Knowledge.CurrentAction; // TODO SQX: This is the temporary workaround...
+			
+			if (_currentAction is MoveAction) then
+			{
+				_leaderPos = [_self.Knowledge.Group] call _self.World.GetLeaderPos;
+				_squadInVehicle = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
+				_moveAction = _currentAction as MoveAction;
+				
+				_unitContainer = [_self.Knowledge.Group] call _self.World.GetClosestDetectedEnemy;
+			
+				// Move is completed if the squad is mounted and can see nearby enemies
+				if (_squadInVehicle &&  !isNull _unitContainer && { _leaderPos distance (call _unitContainer.GetPosition) < 100 }) then {
+		        	["Completed move #0"] call LogHandler.Debug;
+					player sideChat "Completed #0";
+					return true;
+				};
+				
+				// Move is completed if the squad is mounted and near the destination
+				if (_self.MoveCompletedIfMountedAndMiddleRangeOfTargetPosition) then {
+					if (_squadInVehicle && _leaderPos distance _moveAction.Position <= 150) then {
+			        	["Completed move #1"] call LogHandler.Debug;
+						player sideChat "Completed #1";
+						return true;
+					};
+				};
+				
+				// Move is completed if the squad is at the destination position
+				
+				if (_leaderPos distance _moveAction.Position < 20) then {
+					player sideChat "Completed #2";
+		        	["Completed move #2"] call LogHandler.Debug;
+					return true;
+				};
+				
+				// Move is completed if the order movement is related to a resource location that is already ours
+				_locationCollection = call _self.World.GetResourceLocationCollection;
+				_location = [_moveAction.LocationMarkerName] call _locationCollection.GetResourceLocationByMarkerName;
+				
+				if (_location.Side == side _self.Knowledge.Group) then
+				{
+					player sideChat "Completed #3";
+		        	["Completed move #3"] call LogHandler.Debug;
+					return true;
+				};
+			};
+			
+			return false;
+		};
+		
+		#endregion
+	};
+};

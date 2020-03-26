@@ -93,6 +93,10 @@ namespace Intrusion.Tests.Helpers
 		{
 		};
 		
+		public method SetNewDominantSide("_markerName" as String, "_side" as Side)
+		{
+		};
+		
 		// Finds all resource locations marked on map with names "FactoryX" and "TechLabX" and creates
 		// resource locations for them all.
 		public method AquireAllResourceLocations()
@@ -101,6 +105,12 @@ namespace Intrusion.Tests.Helpers
 		
 		// Creates guarding guerilla units on all resource locations.
 		public method CreateGuerillaUnits()
+		{
+		};
+		
+		// Get the resource location collection.
+		// Returns (ResourceLocationCollection): The resource location collection.
+		public method ResourceLocationCollection GetResourceLocationCollection()
 		{
 		};
 	};

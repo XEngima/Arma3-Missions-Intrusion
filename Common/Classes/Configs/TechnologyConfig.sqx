@@ -1,0 +1,62 @@
+/*
+ * Name:	TechnologyConfig
+ * Date:	2018-12-17
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Class that contains configuration settings for technologies.
+ */
+namespace Intrusion.Common
+{
+	public class TechnologyConfig : ITechnologyConfig
+	{
+		// Creates a TechnologyConfig object.
+		public constructor {
+			// Must match the order in TechnologyEnum.
+			_self.Technologies = [
+				[Technology.Transport, "Transport", 25] new TechnologyInfo,
+				[Technology.Services, "Services", 50] new TechnologyInfo,
+				[Technology.Maintenance, "Maintenance", 75] new TechnologyInfo,
+				[Technology.AdvancedWeapons, "Advanced Weapons", 150] new TechnologyInfo,
+				[Technology.Ordnance, "Ordnance", 250] new TechnologyInfo,
+				[Technology.Motorized, "Motorized Vehicles", 300] new TechnologyInfo,
+				[Technology.AntiAir, "Anti Air", 350] new TechnologyInfo,
+				[Technology.AirRecon, "Air Recon", 400] new TechnologyInfo,
+				[Technology.LightArmor, "Light Armor", 500] new TechnologyInfo,
+				[Technology.Artillery, "Artillery", 600] new TechnologyInfo,
+				[Technology.HeavyArmor, "Heavy Armor", 700] new TechnologyInfo,
+				[Technology.AirArmed, "Armed Air Units", 800] new TechnologyInfo,
+			];
+		};
+		
+		// Gets all technologies.
+		public property Array Technologies { get; protected set; };
+		
+		// Gets a profession vehicle from the list.
+		// Returns (ProfessionVehicle): A profession vehicle. classNull if the vehicle type does not exist.
+		public method TechnologyInfo GetTechnology("_technology" as Technology) {
+			{
+				if (_technology == _x.Technology) then {
+					return _x;
+				};
+			} foreach _self.Technologies as TechnologyInfo;
+			
+			return classNull;
+		};
+		
+		// Gets the next technology to investigate.
+		// _administration (Scalar): The current administration points.
+		// Returns (TechnologyInfo): The technology currently being administered. classNull if all technologies have been established.
+		public method TechnologyInfo GetNextTechnology("_administration" as Scalar)
+		{
+			{
+				if (_x.RequiredAdministration > _administration) then {
+					return _x;
+				};
+			} foreach _self.Technologies as TechnologyInfo;
+			
+			return classNull;
+		};
+	};
+};

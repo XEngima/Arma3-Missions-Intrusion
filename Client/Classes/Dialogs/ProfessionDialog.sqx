@@ -17,7 +17,7 @@ namespace Intrusion.Client
 	{
 		private static fields [
 			"_mOptions" as Array /* of ProfessionType */,
-			"_mProfessionConfig" as IProfessionConfig,
+			"_mProfessionConfig" as ProfessionConfig,
 			"_mVehiclesConfig" as IProfessionVehiclesConfig,
 			"_mTechnologyConfig" as ITechnologyConfig,
 			"_mVehicleClassNamesConfig" as IVehicleClassNamesConfig,
@@ -29,11 +29,10 @@ namespace Intrusion.Client
 	
 		// Initializes the profession dialog.
 		public static method Init(
-			"_professionConfig" as IProfessionConfig,
+			"_professionConfig" as ProfessionConfig,
 			"_technologyConfig" as ITechnologyConfig,
 			"_vehicleClassNamesConfig" as IVehicleClassNamesConfig,
-			"_vehiclesConfig" as IProfessionVehiclesConfig
-		)
+			"_vehiclesConfig" as IProfessionVehiclesConfig)
 		{
 			_mProfessionConfig = _professionConfig;
 			_mVehicleClassNamesConfig = _vehicleClassNamesConfig;
@@ -75,7 +74,7 @@ namespace Intrusion.Client
 				_mPlayersCurrentProfIndex = 0;
 				lbAdd [DialogControl.GroupProfessionListBox, _x.Name];
 				_options pushBack _x.Type;
-			} foreach (call _mProfessionConfig.GetAllProfessions) as Profession;
+			} foreach _mProfessionConfig.Professions as Profession;
             
             _mOptions = _options;
 		};
@@ -104,7 +103,7 @@ namespace Intrusion.Client
 					_profession = [_x] call _mProfessionConfig.GetProfession;
 					// If profession is available, and if the group has a good size
 					if (
-						[playerSide, _profession.Type] call _squadCollection.ProfessionTypeAvailable &&
+						[playerSide, _profession.Type, _mProfessionConfig] call _squadCollection.ProfessionTypeAvailable &&
 						_unitsInPlayerGroup >= _profession.MinGroupSize &&
 						_unitsInPlayerGroup <= _profession.MaxGroupSize &&
 						rating leader group player >= (_profession.RequiredRank as Scalar)
@@ -197,11 +196,10 @@ namespace Intrusion.Client
 				"_weaponNames" as String,
 				"_squadsInBrigade" as String
 			];
-			private _model = "";
 			private _vehicleNames = []; 
-			private _ctrlVehicleModel = (findDisplay 2999) displayCtrl 2230;
+			private _ctrlVehiclePicture = (findDisplay 2999) displayCtrl 2231;
 			private _ctrlDescription = (findDisplay 2999) displayCtrl 2215;
-			//_profession = call _self.GetSelectedProfessionTypeFromCombo;
+			
 			_profession = [call _self.GetSelectedProfessionTypeFromCombo] call _mProfessionConfig.GetProfession;
 			_vehicles = [side player, _profession.Type] call _mVehicleClassNamesConfig.GetProVehiclesClassNameInfo;
 
@@ -227,12 +225,12 @@ namespace Intrusion.Client
  			if (!isNull _vehicles) then {
 
  				if (count _vehicles.ClassNames > 0) then {
-					_className = _vehicles.ClassNames select ((count _vehicles.ClassNames) - 1);
-					_model = (getText(configFile >> "cfgVehicles" >> _className >> "model"));
-					_ctrlVehicleModel ctrlSetModel _model;
-					_ctrlVehicleModel ctrlShow true;
+					_className = _vehicles.ClassNames select 0;
+					_ctrlVehiclePicture ctrlSetText (getText(configFile >> "cfgVehicles" >> _className >> "editorPreview"));
+					_ctrlVehiclePicture ctrlShow true;
 					
 					_vehicleNames = (getText(configFile >> "cfgVehicles" >> _className >> "displayName"));
+					
 				};
 
  				if (count _vehicles.ClassNames > 1) then {
@@ -240,23 +238,22 @@ namespace Intrusion.Client
 				};
 				
 				
-				if (count _vehicles.CargoWeapons > 0) then {
-					_className = _vehicles.CargoWeapons select 0;
+				if (count _vehicles.CargoItems > 0) then {
+					_className = (_vehicles.CargoItems select 0 as VehicleCargoItemInfo).ClassName;
 					_weaponNames = (getText(configFile >> "cfgVehicles" >> _className >> "displayName"));
 				};
 				
 			} else {
-				/* Set a compass as vehicle picture and hide it */
-				_ctrlVehicleModel ctrlSetModel "\a3\Ui_f\objects\Compass.p3d";
-				_ctrlVehicleModel ctrlShow false;
+				_ctrlVehiclePicture ctrlSetText "";
+				_ctrlVehiclePicture ctrlShow false;
 			};
 
 
-			// Required administration: 
+			// Required technology: 
  			_technology = [_profession.RequiredTechnology] call _mTechnologyConfig.GetTechnology;
-			private _requiredResearch = "N/A";
+			private _requiredAdministration = "N/A";
 			if (!isNull _technology && { _technology.Technology != Technology.None } ) then {
-				_requiredResearch = _technology.Name + "  (at " + str _technology.RequiredResearch + ")";
+				_requiredAdministration = _technology.Name + "  (at " + str _technology.RequiredAdministration + ")";
 			};
 
 
@@ -310,7 +307,7 @@ namespace Intrusion.Client
  			private _description = [
 				"<t size='2.2' underline='false'>" + _profession.Name + "</t>",
 				"",
-				"Required administration: " + _requiredResearch,
+				"Required administration: " + _requiredAdministration,
 				"Required player rank: " + ([_profession.RequiredRank] call RankMeta.GetRankText),
 				"Vehicle type: " + _vehicleNames,
 				"Vehicle production cost: " + _cost,

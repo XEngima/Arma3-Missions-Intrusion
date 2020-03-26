@@ -1,0 +1,112 @@
+/*
+ * Name:	PublicVariableHandler
+ * Date:	2017-11-30
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Encapsulates all global variable handling and keeps its global properties persistent and at sync.
+ * over the network.
+ *
+ * Remarks:
+ * This is the *only* only file where the global public network variables are actually written.
+ */ 
+ 
+using Intrusion.Common;
+
+namespace Intrusion.Communication
+{
+	public class PublicVariableHandler
+	{
+		// Sets and broadcasts resource location collection across the network.
+		// _resourceLocationCollection (Array): The resource location collection to be broadcasted.
+		public static method BroadcastResourceLocationCollection("_resourceLocationCollection" as ResourceLocationCollection)
+		{
+			INT_Public_resourceLocationCollection = _resourceLocationCollection;
+			publicVariable "INT_Public_resourceLocationCollection";
+		};
+		
+		// Gets the resource collection from the public network synchronized variable.
+		public static method ResourceLocationCollection GetResourceLocationCollection {
+			INT_Public_resourceLocationCollection
+		};
+		
+		// Gets whether the resource locations has been set on the current machine or not.
+		public static method Boolean ResourceLocationCollectionHasValue {
+			!isNil "INT_Public_resourceLocationCollection"
+		};
+
+		// Sets and broadcasts an squad collection across the network.
+		// _squadCollection (SquadCollection): The squad collection.
+		public static method BroadcastSquadCollection("_squadCollection" as SquadCollection)
+		{
+			INT_Public_squadCollection = _squadCollection;
+			publicVariable "INT_Public_squadCollection";
+		};
+		
+		// Gets the squad collection from the public network synchronized variable.
+		public static method SquadCollection GetSquadCollection { 
+			INT_Public_squadCollection
+		};
+		
+		// Gets whether the squad collection has been set on the current machine or not.
+		public static method Boolean SquadCollectionHasValue {
+			!isNil "INT_Public_squadCollection"
+		};
+
+		// Sets and broadcasts an array of player infos across the network.
+		// _playerInfoCollection (PlayerInfoCollection): A collection of player infos.
+		public static method BroadcastPlayerInfoCollection("_playerInfoCollection" as PlayerInfoCollection)
+		{
+			INT_Public_playerInfoCollection = _playerInfoCollection;
+			publicVariable "INT_Public_playerInfoCollection";
+		};
+		
+		// Gets all player infos from the public network synchronized variable.
+		public static method PlayerInfoCollection GetPlayerInfoCollection { 
+			INT_Public_playerInfoCollection
+		};
+		
+		// Gets whether the player infos has been set on the current machine or not.
+		public static method Boolean PlayerInfoCollectionHasValue {
+			!isNil "INT_Public_playerInfoCollection"
+		};
+
+		// Sets and broadcasts order collection across the network.
+		// _orderCollection (OrderCollection): A collection of orders.
+		public static method BroadcastOrderCollection("_orderCollection" as OrderCollection)
+		{
+			INT_Public_orderCollection = _orderCollection;
+			publicVariable "INT_Public_orderCollection";
+		};
+		
+		// Gets all orders from the public network synchronized variable.
+		public static method OrderCollection GetOrderCollection { 
+			INT_Public_orderCollection
+		};
+		
+		// Gets whether the order collection has been set on the current machine or not.
+		public static method Boolean OrderCollectionHasValue {
+			!isNil "INT_Public_orderCollection"
+		};
+		
+		// Sets and broadcasts an array of intrusion vehicles across the network.
+		// _squads (Array): An array of all intrusion vehicles.
+		public static method BroadcastIntrusionVehicles("_intrusionVehicles" as Array)
+		{
+			INT_Public_intrusionVehicles = _intrusionVehicles;
+			publicVariable "INT_Public_intrusionVehicles";
+		};
+		
+		// Gets all intrusion vehicles from the public network synchronized variable.
+		// Returns (Array of IntrusionVehicle): All intrusion vehicles.
+		public static method Array GetIntrusionVehicles {
+			INT_Public_intrusionVehicles
+		};
+		
+		// Gets whether the intrusion vehicles has been set on the current machine or not.
+		public static method Boolean IntrusionVehiclesHasValue {
+			!isNil "INT_Public_intrusionVehicles"
+		};
+	};
+};

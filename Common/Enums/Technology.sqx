@@ -17,18 +17,22 @@ namespace Intrusion.Common
 		Transport = 1,
 		Services = 2,
 		Maintenance = 3,
-		Ordnance = 4,
-		Motorized = 5,
-		LightArmor = 6,
-		Artillery = 7,
-		HeavyArmor = 8
+		AdvancedWeapons = 4,
+		Ordnance = 5,
+		Motorized = 6,
+		AntiAir = 7,
+		AirRecon = 8,
+		LightArmor = 9,
+		Artillery = 10,
+		HeavyArmor = 11,
+		AirArmed = 12,
 	};
 	
 	public class TechnologyMeta
 	{
 		public static method Init()
 		{
-			_self.LastTechnology = Technology.HeavyArmor;
+			_self.LastTechnology = Technology.AirArmed;
 		};
 		
 		public static property Technology LastTechnology { get; private set; };

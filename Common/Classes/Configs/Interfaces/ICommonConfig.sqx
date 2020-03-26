@@ -11,19 +11,24 @@ namespace Intrusion.Common
 {
 	public interface ICommonConfig
 	{
-		// Gets the technology configs.
+		// Gets the map markers configs.
 		property IMapMarkersConfig MapMarkers { get; };
 		
 		// Gets the technology configs.
 		property ITechnologyConfig Technology { get; };
 		
 		// Gets the profession configs.
-		property IProfessionConfig Professions { get; };
+		property ProfessionConfig Professions { get; };
 		
 		// Gets the vehicle class names config.
 		property IVehicleClassNamesConfig VehicleClassNames { get; };
 		
 		// Gets the profession vehicles config.
 		property IProfessionVehiclesConfig ProfessionVehicles { get; };
+		
+		// Gets the base config.
+		property BaseConfig BaseConfig { get; private set; };
+		
+		property IResourceLocationConfig ResourceLocation { get; };
 	};
 };

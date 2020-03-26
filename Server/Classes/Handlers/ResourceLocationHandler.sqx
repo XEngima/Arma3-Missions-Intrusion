@@ -16,13 +16,14 @@ namespace Intrusion.Server
 {
 	public class ResourceLocationHandler : IResourceLocationHandler
 	{
-		private fields ["_mMapMarkersConfig" as IMapMarkersConfig, "_mUnitSpawner" as IUnitSpawner];
+		private fields ["_mMapMarkersConfig" as IMapMarkersConfig, "_mUnitSpawner" as IUnitSpawner, "_mMarkerHandler" as IMarkerHandler];
 		private fields ["_mResourceLocationCollection" as ResourceLocationCollection];
 		
 		// Creates a ResourceLocationHandler object and seeds with all found factory- and techlab locations.
-		public constructor("_mapMarkersConfig" as IMapMarkersConfig, "_unitSpawner" as IUnitSpawner) {
+		public constructor("_mapMarkersConfig" as IMapMarkersConfig, "_unitSpawner" as IUnitSpawner, "_markerHandler" as IMarkerHandler) {
 			_mMapMarkersConfig = _mapMarkersConfig;
 			_mUnitSpawner = _unitSpawner;
+			_mMarkerHandler = _markerHandler;
 			
 			_mResourceLocationCollection = new ResourceLocationCollection;
 			_self.FactoryLocationsCount = 0;
@@ -35,13 +36,18 @@ namespace Intrusion.Server
 		// Finds all resource locations marked on map with names "FactoryX" and "TechLabX" and creates
 		// resource locations for them all.
 		public method AquireAllResourceLocations {
-			private ["_number" as Scalar];
+			private ["_number" as Scalar, "_markerName" as String];
 			
 			// Find all factory locations
 			_number = 1;
 			while { ["Factory" + str _number] call MarkerHelper.MarkerExists } do
 			{
-				[["Factory" + str _number, ResourceFacility.Factory] new ResourceLocation] call _mResourceLocationCollection.AddResourceLocation;
+				_markerName = "Factory" + str _number;
+				
+				// Create the flag pole on the map
+				private _flag = "Flag_Green_F" createVehicle ([_markerName] call _mMarkerHandler.GetMarkerPos);
+
+				[[_markerName, ResourceFacility.Factory, _flag] new ResourceLocation] call _mResourceLocationCollection.AddResourceLocation;
 				_number = _number + 1;
 			};
 			
@@ -51,7 +57,12 @@ namespace Intrusion.Server
 			_number = 1;
 			while { ["Office" + str _number] call MarkerHelper.MarkerExists } do
 			{
-				[["Office" + str _number, ResourceFacility.TechLab] new ResourceLocation] call _mResourceLocationCollection.AddResourceLocation;
+				_markerName = "Office" + str _number;
+				
+				// Create the flag pole on the map
+				private _flag = "Flag_Green_F" createVehicle ([_markerName] call _mMarkerHandler.GetMarkerPos);
+
+				[[_markerName, ResourceFacility.TechLab, _flag] new ResourceLocation] call _mResourceLocationCollection.AddResourceLocation;
 				_number = _number + 1;
 			};
 			
@@ -59,8 +70,7 @@ namespace Intrusion.Server
 			
 			// Set winner's location
 			private _resourceLocations = call _mResourceLocationCollection.GetResourceLocations;
-			private _winnersIndex = floor random count _resourceLocations;
-			_self.WinnersLocation = _resourceLocations select _winnersIndex;
+			_self.WinnersLocation = selectRandom _resourceLocations;
 			_self.WinnersLocation.IsWinnersLocation = true;
 			_self.WinnersLocation.MarkerName setMarkerType _mMapMarkersConfig.WinnersLocationMarkerType;
 			
@@ -95,6 +105,26 @@ namespace Intrusion.Server
 			classNull
 		};
 		
+		// Sets the dominant side of a resource location and sends resource location updates to clients.
+		// _markerName (String): Name of the marker associated with the flag.
+		// _dominantSide (Side): The side that is dominating the side.
+		public method SetNewDominantSide("_markerName" as String, "_dominantSide" as Side)
+		{
+			private ["_resourceLocation" as ResourceLocation];
+		
+			_resourceLocation = [_markerName] call _self.GetResourceLocation;
+			
+			if (!isNull _resourceLocation) then {
+				_resourceLocation.DominantSide = _dominantSide;
+				
+				call _self.BroadcastResourceLocations;
+				
+				if (_dominantSide != civilian) then {
+					["ClientMessageHandler.ShowHint", [([_resourceLocation.MarkerName] call _mMarkerHandler.GetMarkerText) + " is being taken over by " + str _dominantSide]] call Remote.Invoke;
+				};
+			};
+		};
+		
 		// Sets a new owner for a resource location and sends resource location updates to clients.
 		// _markerName (String): Name of the marker associated with the flag.
 		// _side (Side): The side of the player that captured the flag.
@@ -113,7 +143,7 @@ namespace Intrusion.Server
 				(_resourceLocation.Flag) setFlagTexture _markerInfo.FlagTexture;
 					
 				call _self.BroadcastResourceLocations;
-				["ClientMessageHandler.ShowHint", [_resourceLocation.Text + " was captured by " + str _side]] call Remote.Invoke;
+				["ClientMessageHandler.ShowHint", [([_resourceLocation.MarkerName] call _mMarkerHandler.GetMarkerText) + " was captured by " + str _side]] call Remote.Invoke;
 			};
 		};
 		
@@ -142,37 +172,61 @@ namespace Intrusion.Server
 		// Creates guarding guerilla units on all resource locations.
 		public method CreateGuerillaUnits()
 		{
-			private ["_resourceLocations" as Array, "_location" as ResourceLocation, "_pos" as Array, "_waypoint" as Array, "_i" as Scalar, "_group" as Group, "_noOfUnits" as Scalar, "_roadSegments" as Array];
+			private ["_resourceLocations" as Array, "_location" as ResourceLocation, "_pos" as Array, "_waypoint" as Array, "_group" as Group, "_noOfUnits" as Scalar, "_roadSegments" as Array];
 			
 			_resourceLocations = call _mResourceLocationCollection.GetResourceLocations;
-			_i = 0;
 			
 			{
 				_location = _x;
-				_i = _i + 1;
 				
 				// Create a marker
 				
-				_pos = getMarkerPos _location.MarkerName;
+				private _locationPos = getMarkerPos _location.MarkerName;
 				
 				// Create a group
 				
 				_group = createGroup [independent, true];
 				_noOfUnits = (floor random 3) + 1;
-				_roadSegments = _pos nearRoads 50;
+				_roadSegments = _locationPos nearRoads 50;
 				
-				_waypoint = _group addWaypoint [_pos, 25];
-				_waypoint setWaypointType "HOLD";
+				_pos = [(_locationPos select 0) - 25 + random 50, (_locationPos select 1) - 25 + random 50, 0];
+				_waypoint = _group addWaypoint [_pos, 20];
+				_waypoint setWaypointType "MOVE";
+				_waypoint setWaypointBehaviour "SAFE";
+				_waypoint setWaypointSpeed "LIMITED";
+				_waypoint setWaypointCombatMode "YELLOW";
+				
+				_pos = [(_locationPos select 0) - 25 + random 50, (_locationPos select 1) - 25 + random 50, 0];
+				_waypoint = _group addWaypoint [_pos, 20];
+				
+				_pos = [(_locationPos select 0) - 25 + random 50, (_locationPos select 1) - 25 + random 50, 0];
+				_waypoint = _group addWaypoint [_pos, 20];
+				_waypoint setWaypointType "CYCLE";
 				
 				if (count _roadSegments > 0) then {
 					_pos = getPos (selectRandom _roadSegments);
 				};
 				
 				for "_i" from 1 to _noOfUnits do {
-					["I_soldier_F", _pos, _group] call _mUnitSpawner.CreateUnit;
+					private _unit = ["I_soldier_F", _pos, _group] call _mUnitSpawner.CreateUnit;
+
+					if (random 100 < 50) then
+					{
+						_unit addBackpackGlobal "B_Kitbag_cbr";
+						(unitBackpack _unit) addMagazineCargoGlobal ["RPG32_F", 1];
+						_unit addWeaponGlobal "launch_RPG32_F";
+						removeBackpackGlobal _unit;
+					};
 				};
 				
 			} foreach _resourceLocations as ResourceLocation;
+		};
+		
+		// Get the resource location collection.
+		// Returns (ResourceLocationCollection): The resource location collection.
+		public method ResourceLocationCollection GetResourceLocationCollection()
+		{
+			_mResourceLocationCollection
 		};
 	};
 };

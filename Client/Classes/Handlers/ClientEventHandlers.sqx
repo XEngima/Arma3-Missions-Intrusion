@@ -27,7 +27,13 @@ namespace Intrusion.Client
 			
 			// Fires when preload finishes.
 			["ClientEventHandlerId_01", "onPreloadFinished",
-			{ 
+			{
+				// Set the name of the group for the map
+				(group player) setVariable ["MapName", name player, true];
+				
+				// Remove backpacks
+				removeBackpackGlobal player;
+				
 				if (didJIP) then {
 					// Perform JIP stuff
 					[gCommonConfig.MapMarkers] call JipService.StartAsync;
@@ -39,7 +45,7 @@ namespace Intrusion.Client
 					[] spawn {
 						sleep 1;
 						
-						if (ReleaseSettings.ShowTutorials) then {
+						if (StartConfig.ShowTutorials) then {
 							[TutorialType.Welcome] call TutorialHandler.ShowTutorial;
 						};
 					};
@@ -60,31 +66,9 @@ namespace Intrusion.Client
 			player addEventHandler ["Respawn", {
 				params ["_player" as Object, "_corpse"];
 				["ClientEventReciever.OnPlayerRespawn", [_player, _corpse]] call Remote.Invoke;
-			}];
-			
-			player addEventHandler ["Take", {
-				params ["_unit" as Object, "_container" as Object, "_item" as Object];
-				private ["_squadCollection" as SquadCollection, "_squad" as Squad, "_itemIsRangeSniperRifle" as Boolean, "_itemIsRangeFinder" as Boolean];
 				
-				if (_unit == player) then
-				{
-					_itemIsRangeSniperRifle = (_item call BIS_fnc_itemtype) select 1 == "SniperRifle";
-					_itemIsRangeFinder = "RangeFinder" in  (vestItems player + uniformItems player + backpackItems player + assignedItems player);
-					
-					if ((_itemIsRangeFinder || _itemIsRangeSniperRifle) && call PublicVariableHandler.SquadCollectionHasValue) then
-					{
-						_squadCollection = call PublicVariableHandler.GetSquadCollection;
-						_squad = [group player] call _squadCollection.GetSquadByGroup;
-						
-						if (isNull _squad || {_squad.ProfessionType != ProfessionType.Sniper}) then {
-							player removeWeapon primaryWeapon player;
-							
-							removeGoggles player;
-							
-							["Only sniper teams are allowed to have that item.", player] call ClientMessageHandler.ShowMessage;
-						};
-					};
-				};
+				// Remove backpacks
+				removeBackpackGlobal _player;
 			}];
 			
 			player addEventHandler ["GetInMan", {
@@ -96,7 +80,7 @@ namespace Intrusion.Client
 					[_resourceLocationCollection] call ClientResourceLocationHandler.UpdateResourceLocations;
 				};
 
-				["ClientEventReciever.OnUnitEnteredVehicle", [_unit, _role, _vehicle, _turret]] call Remote.Invoke;
+				["ClientEventReciever.OnUnitEnteredVehicle", [_unit, [_role] call VehicleRoleMeta.ToVehicleRole, _vehicle, _turret]] call Remote.Invoke;
 			}];
 			
 			player addEventHandler ["GetOutMan", {
@@ -143,6 +127,10 @@ namespace Intrusion.Client
 			player addEventHandler ["SeatSwitchedMan", {
 				params ["_unit" as Object, "_unit2" as Object, "_vehicle" as Object];
 				["ClientEventReciever.OnUnitChangedSeat", [_unit, _vehicle]] call Remote.Invoke;
+			}];
+			
+			player addEventHandler ["HandleRating", {
+				0
 			}];
 		};
 	};

@@ -8,30 +8,37 @@
  * Service that handles the process when a brigade leader is building a new base.
  */
 
+using Sqx.Services;
 using Intrusion.Common;
 
 namespace Intrusion.Server
 {
-	public class MoveBaseService : IService
+	public class MoveBaseService : Service
 	{
 		private fields ["_mSide" as Side, "_mBaseLayout" as BaseLayout, "_mMessageHandler" as IMessageHandler, "_mMapMarkersConfig" as IMapMarkersConfig, "_mVehicleSpawner" as IVehicleSpawner];
-		private fields ["_mMapMarkerInfo" as MapMarkerInfo];
+		private fields ["_mMapMarkerInfo" as MapMarkerInfo, "_mBaseConfig" as BaseConfig];
 		
 		// Creates a MoveBaseService object.
 		// _leader (Object): The leader unit moving the base.
-		public constructor("_side" as Side, "_baseLayout" as BaseLayout, "_messageHandler" as IMessageHandler, "_mapMarkersConfig" as IMapMarkersConfig, "_vehicleSpawner" as IVehicleSpawner) {
-			_self.IsRunning = false;
+		public constructor(
+			"_side" as Side, 
+			"_baseLayout" as BaseLayout, 
+			"_messageHandler" as IMessageHandler, 
+			"_mapMarkersConfig" as IMapMarkersConfig, 
+			"_vehicleSpawner" as IVehicleSpawner,
+			"_baseConfig" as BaseConfig)
+		{
+			call _base.Constructor;
 			
 			_mSide = _side;
 			_mBaseLayout = _baseLayout;
 			_mMessageHandler = _messageHandler;
 			_mMapMarkersConfig = _mapMarkersConfig;
 			_mVehicleSpawner = _vehicleSpawner;
+			_mBaseConfig = _baseConfig;
 		};
 		
-		public property Boolean IsRunning { get; private set; };
-		
-		private method Run()
+		protected override method Run()
 		{
 			private ["_side" as Side, "_newWeaponPos" as Array, "_oldWeaponPos" as Array, "_oldVehicleSpawnPos" as Array, "_offsetX" as Scalar, "_offsetY" as Scalar];
 		    private ["_timeLeft" as Scalar, "_sleepTime" as Scalar, "_allSpawnedVehicles" as Array];
@@ -39,7 +46,7 @@ namespace Intrusion.Server
 			_side = _mSide;
 			_mMapMarkerInfo = [_side] call _mMapMarkersConfig.GetMapMarkerInfo;
 			
-			_timeLeft = 20;
+			_timeLeft = _mBaseConfig.TimeRequiredToMoveBase;
 			_sleepTime = 10;
 			
 	    	while { _timeLeft > 0 } do {
@@ -55,6 +62,7 @@ namespace Intrusion.Server
 			
 			// Move carpark marker and vehicles
 			
+			[_side] call _mVehicleSpawner.RemoveSidesHelipads;
 			_oldVehicleSpawnPos = getMarkerPos _mMapMarkerInfo.CarParkMarkerName;
 			_mMapMarkerInfo.CarParkMarkerName setMarkerPos _mBaseLayout.CarParkPlacement.Position;
 			_mMapMarkerInfo.CarParkMarkerName setMarkerDir _mBaseLayout.CarParkPlacement.Direction;
@@ -66,7 +74,7 @@ namespace Intrusion.Server
 				_intrusionVehicle = _x;
 				
 				// Move vehicle if it is near the base and is empty
-				if (_intrusionVehicle.Vehicle distance _oldVehicleSpawnPos < 125 && count (units _intrusionVehicle.Vehicle) == 0) then
+				if (_intrusionVehicle.Vehicle distance _oldVehicleSpawnPos < _mBaseConfig.BaseRadius && count (units _intrusionVehicle.Vehicle) == 0) then
 				{
 				    [_intrusionVehicle.Vehicle, _intrusionVehicle.Side] call _mVehicleSpawner.PlaceVehicleOnCarPark;
 				};
@@ -90,12 +98,8 @@ namespace Intrusion.Server
 			_mMapMarkerInfo.WeaponDepotMarkerName setMarkerPos _newWeaponPos;
 			
 			["Your brigade leader has moved your base to a new location.", _side] call _mMessageHandler.ShowHint;
-		};
-		
-		public method RunAsync()
-		{
-			_self.IsRunning = true;
-			[] spawn _self.Run;
+			
+			call _base.Run;
 		};
 	};
 };

@@ -1,0 +1,67 @@
+/*
+ * Name:	Service
+ * Date:	2019-07-22
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * A base class for all services.
+ */
+namespace Sqx.Services
+{
+	public class Service : IService
+	{
+		private fields ["_mScriptHandle" as Handle];
+		
+		// Creates a Service object.
+		public constructor()
+		{
+			_self.IsRunning = false;
+			_self.IsCancelling = false;
+		};
+		
+		// Gets whether the service is currently running or not.
+		public property Boolean IsRunning { get; private set; };
+		
+		// Gets whether the service is currently asked to stop running.
+		protected property Boolean IsCancelling { get; private set; };
+		
+		// Called from RunAsync to reset things when starting a new processing.
+		protected virtual method Initialize()
+		{
+		};
+		
+		// Performs the service's logic as a separate process.
+		// Call this from the sub class'. Run when returning from the method (exiting service script).
+		protected virtual method Run()
+		{
+			_self.IsRunning = false;
+			_self.IsCancelling = false;
+		};
+		
+		// Starts the service to run concurrently.
+		// If service is already running, service will not restart, but only return the currently running script handle.
+		// Returns (Handle): The script handle for the running script.
+		public method Handle RunAsync()
+		{
+			if (!_self.IsRunning) then
+			{
+				_self.IsRunning = true;
+				_self.IsCancelling = false;
+				
+				call _self.Initialize;
+				_mScriptHandle = spawn _self.Run;
+			};
+			
+			return _mScriptHandle;
+		};
+		
+		// Asks the service to stop processing. If supported, script will close as soon as possible, and its IsRunning will be
+		// set to false when that happens.
+		// Returns (Handle): The script handle.
+		public method Handle Cancel()
+		{
+			_self.IsCancelling = true;
+		};
+	};
+};

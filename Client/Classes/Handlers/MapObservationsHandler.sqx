@@ -15,10 +15,10 @@ namespace Intrusion.Client
 {
 	public class MapObservationsHandler
 	{
-		private static fields ["_mMapObservationIds" as Array /* as Scalar */, "_mProfessionConfig" as IProfessionConfig];
+		private static fields ["_mMapObservationIds" as Array /* as Scalar */, "_mProfessionConfig" as ProfessionConfig];
 
 		// Initializes the MapObservationsHandler.
-		public static method Init("_professionConfig" as IProfessionConfig)
+		public static method Init("_professionConfig" as ProfessionConfig)
 		{
 			_mProfessionConfig = _professionConfig;
 			_mMapObservationIds = [];
@@ -32,10 +32,11 @@ namespace Intrusion.Client
 			
 			_name = "INT_MapObservationMarker_" + str _mapObservation.Id;
 			
-			createMarkerLocal [_name, _mapObservation.PercievedPos];
+			createMarkerLocal [_name, _mapObservation.PercievedOffsetPos];
 			
 			_color = "ColorGrey";
 			_markerType = "n_unknown";
+			
 			if (_mapObservation.IsIdentifiedAsEnemy) then {
 				_profession = [_mapObservation.PercievedProfessionType] call _mProfessionConfig.GetProfession;
 				
@@ -61,7 +62,7 @@ namespace Intrusion.Client
 			
 			_name = "INT_MapObservationMarker_" + str _mapObservation.Id;
 			
-			_name setMarkerPosLocal _mapObservation.PercievedPos;
+			_name setMarkerPosLocal (_mapObservation.PercievedOffsetPos);
 			
 			_color = "ColorGrey";
 			_markerType = "n_unknown";
@@ -94,7 +95,7 @@ namespace Intrusion.Client
 		};
 		
 		// Updates all map observations on the map.
-		// _mapObservations (Array): All current mapobservations.
+		// _mapObservations (Array of MapObservation): All current mapobservations.
 		public static method UpdateMap("_mapObservations" as Array)
 		{
 			private ["_newMapObservationIds" as Array, "_mapObservation" as MapObservation, "_id" as Scalar];

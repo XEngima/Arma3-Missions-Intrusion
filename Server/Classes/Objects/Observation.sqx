@@ -32,7 +32,9 @@ namespace Intrusion.Server
 			"_unit" as Object, 
 			"_percievedProfessionType" as ProfessionType, 
 			"_accuracy" as Scalar, 
-			"_time" as Scalar)
+			"_time" as Scalar,
+			"_percievedOffsetPos" as Array,
+			"_observedDistance" as Scalar)
 		{
 			_mMissionTime = new MissionTime;
 			
@@ -46,6 +48,8 @@ namespace Intrusion.Server
 			_self.Accuracy = _accuracy;
 			_self.MarkedAsDeleted = false;
 			_self.Time = _time;
+			_self.PercievedOffsetPos = _percievedOffsetPos;
+			_self.ObservedDistance = _observedDistance;
 		};
 		
 		// Gets the unique and persistent Name of the observation.
@@ -78,6 +82,12 @@ namespace Intrusion.Server
 		// Gets the time when the target was first observed.
 		public property Scalar Time { get; set; };
 		
+		// Gets the distance from the observer to the target.
+		public property Scalar ObservedDistance { get; set; };
+		
+		// Gets the percieved position with percivation error added.
+		public property Array PercievedOffsetPos { get; set; };
+		
 		// Converts this observation into a map observation that is optimized for broadcasting and client use.
 		public method MapObservation ToMapObservation {
 			private ["_isIdentifiedAsEnemy" as Boolean];
@@ -89,7 +99,7 @@ namespace Intrusion.Server
 				_isIdentifiedAsEnemy = [_self.ObservingSide, _self.PercievedSide] call BIS_fnc_sideIsEnemy;
 			};
 
-			[_self.Id, _self.ObservingSide, _self.PercievedPos, _isIdentifiedAsEnemy, _self.PercievedProfessionType, (call _mMissionTime.GetMissionTime) > _self.Time + 10] new MapObservation
+			[_self.Id, _self.ObservingSide, _isIdentifiedAsEnemy, _self.PercievedProfessionType, (call _mMissionTime.GetMissionTime) > _self.Time + 10, _self.PercievedOffsetPos] new MapObservation
 		};
 	};
 };

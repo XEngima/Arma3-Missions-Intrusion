@@ -52,7 +52,7 @@ namespace Intrusion.Server
 				params ["_unit" as Object, "_killer" as Object, "_instigator" as Object, "_useEffects" as Boolean];
 				private ["_rating" as Scalar, "_addingRating" as Scalar];
 				
-				// If the killer is an enemy and the killer is an AI, add killed rating.
+				// If the killer is an enemy, add killed rating.
 				if ([side group _unit, side group _killer] call BIS_fnc_sideIsEnemy) then
 				{
 					_addingRating = [count units group _killer] call gCommon.RatingCalculator.CalculateGroupRatingEnemyKill;
@@ -72,14 +72,28 @@ namespace Intrusion.Server
 			}];
 		};
 		
+		// This is called when a new Ai unit is spawned.
+		// Adds a unit entering vehicle event handler.
+		// _unit (Object): The unit to add eventhandler to.
 		public static method AddGetInManEventHandler("_unit" as Object)
 		{
 			_unit addEventHandler ["GetInMan", {
 				params ["_unit" as Object, "_role" as String, "_vehicle" as Object, "_turret" as Array];
-				["ClientEventReciever.OnUnitEnteredVehicle", [_unit, _role, _vehicle, _turret]] call Remote.Invoke;
+				[_unit, [_role] call VehicleRoleMeta.ToVehicleRole, _vehicle] call ServerEventReciever.OnAiEnteredVehicle;
 			}];
 		};
 		
+		// This is called when a new Ai unit is spawned.
+		// Adds a unit exiting vehicle event handler.
+		// _unit (Object): The unit to add eventhandler to.
+		public static method AddGetOutManEventHandler("_unit" as Object)
+		{
+			_unit addEventHandler ["GetOutMan", {
+				params ["_unit" as Object, "_role" as String, "_vehicle" as Object, "_turret" as Array];
+				unassignVehicle _unit;
+			}];
+		};
+			
 		// Adds a rating event handler to a player.
 		// _player (Object): The player to add the rating event handler to.
 		public static method AddRatingEventHandlerToPlayer("_player" as Object)

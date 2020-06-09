@@ -50,5 +50,45 @@ Intrusion_BattleLocations = [
             ["Comms Whiskey (Office)", "OFFICE", [2670.97,12312.9,0]],
             ["GSM Station (Office)", "OFFICE", [2939.98,13112.8,0]]
         ]
+    ],
+    [
+        "Bridge Over Yanukka Bay",
+        [
+            ["RespawnMarkerWest", [2008.4,6511.74,0], 54],
+            ["WeaponsMarkerWest", [2015.21,6560.24,0], 290],
+            ["VehicleMarkerWest", [2036.89,6593.44,0], 88],
+            ["RespawnMarkerEast", [4400.06,2904.8,0], 330],
+            ["VehicleMarkerEast", [4394.84,2910.76,0], 333],
+            ["VehicleMarkerEast", [4378.33,2941.27,0], 318]
+        ],
+        [
+            ["Small Harbor (Factory)", "FACTORY", [5622.01,4004.52,0]],
+            ["Bala Airstrip (Factory)", "FACTORY", [2101.48,3416.59,0]],
+            ["North Harbor (Factory)", "FACTORY", [848.913,7678.46,0]],
+            ["Radar Station (Factory)", "FACTORY", [2393.73,7230.62,0]],
+            ["South Bridge Watch (Office)", "OFFICE", [4884.12,5104.91,0]],
+            ["Fuel Depot (Office)", "OFFICE", [2272.27,6331.29,0]],
+            ["North Bridge Watch (Office)", "OFFICE", [3793.85,5954.49,0]],
+            ["GSM Station (Office)", "OFFICE", [4699.96,3172.92,0]]
+        ]
+    ],
+    [
+        "Battle Of Georgetown",
+        [
+            ["RespawnMarkerWest", [4582.53,8681.09,0], 292],
+            ["WeaponsMarkerWest", [4581.02,8696.54,0], 222],
+            ["VehicleMarkerWest", [4515.59,8724.58,0], 341],
+            ["RespawnMarkerEast", [5657.45,12105.3,0], 299],
+            ["VehicleMarkerEast", [5641.9,12103,0], 19],
+            ["VehicleMarkerEast", [5596.1,12116.3,0], 272]
+        ],
+        [
+            ["The Harbor (Factory)", "FACTORY", [5271.35,10030,0]],
+            ["The Plantage (Factory)", "FACTORY", [6477.04,11033.1,0]],
+            ["Train Station (Factory)", "FACTORY", [5400.74,11199.7,0]],
+            ["Town Centre (Office)", "OFFICE", [5799.33,10685.2,0]],
+            ["The Barracks (Office)", "OFFICE", [6285.98,9989.28,0]],
+            ["The Mast (Office)", "OFFICE", [6012.25,10421.5,0]]
+        ]
     ]
 ];

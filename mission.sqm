@@ -263,7 +263,7 @@ class Mission
 			position[]={2583.5046,89.603996,3270.5334};
 			name="respawn_west";
 			type="Empty";
-			angle=54.406841;
+			angle=54.406834;
 			id=0;
 			atlOffset=57.432457;
 		};
@@ -284,7 +284,7 @@ class Mission
 			position[]={4886.8765,5.1181593,4308.1152};
 			name="respawn_east";
 			type="Empty";
-			angle=49.872459;
+			angle=49.872456;
 			id=2;
 			atlOffset=1.4938011;
 		};
@@ -360,7 +360,7 @@ class Mission
 			name="INT_CarParkWest";
 			type="Empty";
 			fillName="Border";
-			angle=341.54019;
+			angle=341.54016;
 			drawBorder=1;
 			id=9;
 		};

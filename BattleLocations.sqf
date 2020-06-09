@@ -30,5 +30,25 @@ Intrusion_BattleLocations = [
             ["Yanukka (Office)", "OFFICE", [2924.14,3412.82,0]],
             ["GSM Station (Office)", "OFFICE", [4699.96,3172.92,0]]
         ]
+    ],
+    [
+        "Tuvanaka",
+        [
+            ["RespawnMarkerWest", [2037.91,10797.8,0], 257],
+            ["WeaponsMarkerWest", [2037.81,10814,0], 83],
+            ["VehicleMarkerWest", [2083.85,10856.5,0], 135],
+            ["RespawnMarkerEast", [3800.45,13648,0], 164],
+            ["VehicleMarkerEast", [3805.92,13629.4,0], 170],
+            ["VehicleMarkerEast", [3811.82,13561.4,0], 168]
+        ],
+        [
+            ["Budul's Hardware (Factory)", "FACTORY", [2011.19,11813.5,0]],
+            ["Airbase (Factory)", "FACTORY", [2039.46,13006.5,0]],
+            ["Belfort (Factory)", "FACTORY", [3139.81,11210.9,0]],
+            ["Small Harbor (Office)", "OFFICE", [4113.08,11702.7,0]],
+            ["Training Camp (Office)", "OFFICE", [3980.16,13858.7,0]],
+            ["Comms Whiskey (Office)", "OFFICE", [2670.97,12312.9,0]],
+            ["GSM Station (Office)", "OFFICE", [2939.98,13112.8,0]]
+        ]
     ]
 ];

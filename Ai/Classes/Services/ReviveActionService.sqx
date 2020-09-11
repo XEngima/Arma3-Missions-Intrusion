@@ -15,10 +15,10 @@ namespace Intrusion.Ai
 {
 	public class ReviveActionService : ActionService
 	{
-		private fields ["_mGroup" as Group, "_mDeadUnit" as UnitContainer, "_mRevivingUnit" as UnitContainer];
+		private fields ["_mGroup" as Group, "_mDeadUnit" as IUnitContainer, "_mRevivingUnit" as IUnitContainer];
 		
 		// Creates a ReviveActionService object.
-		public constructor("_time" as IMissionTime, "_timeoutTime" as Scalar, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_group" as Group, "_deadUnit" as UnitContainer, "_revivingUnit" as UnitContainer) {
+		public constructor("_time" as IMissionTime, "_timeoutTime" as Scalar, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_group" as Group, "_deadUnit" as IUnitContainer, "_revivingUnit" as IUnitContainer) {
 			[_time, _timeoutTime, _world, _actionPerformer] call _base.Constructor;
 			
 			_mGroup = _group;

@@ -187,12 +187,12 @@ namespace Intrusion.Ai
 		// Moves a single unit in a group to a position.
 		// _unitContainer (UnitContainer): The unit to move.
 		// _position (Array): The position to move to.
-		public method MoveSingleUnit("_unitContainer" as UnitContainer, "_position" as Array)
+		public method MoveSingleUnit("_unitContainer" as IUnitContainer, "_position" as Array)
 		{
 			_unitContainer.Unit commandMove _position;
 		};
 		
-		private method CreateAiUnitFromDeadBody("_deadUnit" as UnitContainer, "_group" as Group)
+		private method CreateAiUnitFromDeadBody("_deadUnit" as IUnitContainer, "_group" as Group)
 		{
 			private ["_pos" as Array, "_dir" as Scalar, "_type" as String, "_nameSound" as String, "_face" as String, "_speaker" as String];
 			private ["_loadout" as Array, "_wpnCargo" as Array, "_newUnit" as Object];
@@ -224,7 +224,7 @@ namespace Intrusion.Ai
 		// Makes a dead AI unit alive again and puts it in a group.
 		// _unitContainer (UnitContainer): The unit to make alive.
 		// _group (Group): The group to insert the unit into after being made alive.
-		public method MakeAliveAiUnit("_unit" as UnitContainer, "_group" as Group)
+		public method MakeAliveAiUnit("_unit" as IUnitContainer, "_group" as Group)
 		{
 			[_unit, _group] call _self.CreateAiUnitFromDeadBody;
 			[_unit.Unit] joinSilent _group;

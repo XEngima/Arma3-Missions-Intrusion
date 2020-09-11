@@ -16,6 +16,6 @@ namespace Intrusion.Ai
 	{
 		method IActionService CreateDisembarkService("_time" as IMissionTime, "_timeoutTime" as Scalar, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_group" as Group, "_aiVehicle" as VehicleContainer);
 		
-		method IActionService CreateReviveService("_time" as IMissionTime, "_timeoutTime" as Scalar, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_group" as Group, "_deadUnit" as UnitContainer, "_revivingUnit" as UnitContainer);
+		method IActionService CreateReviveService("_time" as IMissionTime, "_timeoutTime" as Scalar, "_world" as IWorld, "_actionPerformer" as IActionPerformer, "_group" as Group, "_deadUnit" as IUnitContainer, "_revivingUnit" as IUnitContainer);
 	};
 };

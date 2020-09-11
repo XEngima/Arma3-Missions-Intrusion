@@ -139,7 +139,7 @@ namespace Intrusion.Ai
 			
 			private ["_reviveService" as IActionService];
         	private _time = call _self.Time.GetMissionTime;
-        	private _deadUnit = classNull;
+        	private IUnitContainer _deadUnit = classNull;
         	private _aliveUnit = classNull;
 			private _squadMounted = [_self.Knowledge.Group] call _self.World.CheckSquadMounted;
         	

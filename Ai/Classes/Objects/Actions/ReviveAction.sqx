@@ -12,13 +12,13 @@ namespace Intrusion.Ai
 	public class ReviveAction : Action
 	{
 		// Creates a ReviveAction object.
-		public constructor("_timeoutTime" as Scalar, "_service" as IActionService, "_unitToRevive" as UnitContainer)
+		public constructor("_timeoutTime" as Scalar, "_service" as IActionService, "_unitToRevive" as IUnitContainer)
 		{
 			[_timeoutTime] call _base.Constructor;
 			_self.Service = _service;
 			_self.UnitToRevive = _unitToRevive;
 		};
 		
-		public property UnitContainer UnitToRevive { get; private set; };
+		public property IUnitContainer UnitToRevive { get; private set; };
 	};
 };

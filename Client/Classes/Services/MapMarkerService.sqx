@@ -260,7 +260,7 @@ namespace Intrusion.Client
 			// Add and update all vehicle support markers
 			
 			{
-				private _marker = [_x.Key] call _self.GetSupportMarkerByVehicle as Marker;
+				var _marker = [_x.Key] call _self.GetSupportMarkerByVehicle;
 				
 				if (isNull _marker) then
 				{
@@ -273,7 +273,7 @@ namespace Intrusion.Client
 					if (_percent < 25) then {
 						_color = "ColorRed";
 					};
-					
+
 					_marker = [getPos _x.Key, "mil_triangle", _color, "(" + str _percent + "%)"] call Marker.CreateIconMarkerLocal;
 					_mSupportMarkers pushBack _marker;
 				}
